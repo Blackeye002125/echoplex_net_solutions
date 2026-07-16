@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ECHOPLEX - Personal Network Scanner</title>
+    <title>ECHOPLEX - Personal IP Scanner</title>
     <style>
         /* ===== RESET & BASE ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -203,15 +203,15 @@
         .btn-quantum { background: linear-gradient(135deg, var(--secondary), var(--primary)); color: white; border-color: var(--secondary); }
         .btn-quantum:hover { box-shadow: 0 0 40px rgba(124,58,237,0.5); }
 
-        .panel-body { padding: 14px 18px; max-height: 450px; overflow-y: auto; }
+        .panel-body { padding: 14px 18px; max-height: 500px; overflow-y: auto; }
         .panel-body::-webkit-scrollbar { width: 4px; }
         .panel-body::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); }
         .panel-body::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 4px; }
 
-        /* ===== NETWORK MAP ===== */
+        /* ===== NETWORK TOPOLOGY ===== */
         .network-topology {
             position: relative;
-            min-height: 380px;
+            min-height: 400px;
             background: rgba(0,0,0,0.3);
             border-radius: 10px;
             padding: 12px;
@@ -233,6 +233,7 @@
             border-radius: 8px;
             border: 1px solid rgba(255,255,255,0.05);
             backdrop-filter: blur(10px);
+            flex-wrap: wrap;
         }
 
         .legend-item { display: flex; align-items: center; gap: 4px; }
@@ -245,7 +246,11 @@
         .legend-dot.hub { background: var(--primary); animation: pulse 2s infinite; }
 
         /* ===== DEVICE LIST ===== */
-        .device-list { display: flex; flex-direction: column; gap: 5px; }
+        .device-list { display: flex; flex-direction: column; gap: 5px; max-height: 320px; overflow-y: auto; }
+        .device-list::-webkit-scrollbar { width: 4px; }
+        .device-list::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+        .device-list::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 4px; }
+        
         .device-item {
             display: flex;
             align-items: center;
@@ -327,7 +332,7 @@
             box-shadow: 0 0 20px rgba(0,212,255,0.1);
         }
 
-        .ip-input-section .scan-range-badge {
+        .ip-input-section .scan-badge {
             font-size: 9px;
             padding: 4px 12px;
             border-radius: 12px;
@@ -430,7 +435,7 @@
         /* ===== ALERT LOG ===== */
         .alert-log { display: flex; flex-direction: column; gap: 3px; max-height: 150px; overflow-y: auto; }
         .alert-log::-webkit-scrollbar { width: 4px; }
-        .alert-log::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); }
+        .alert-log::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
         .alert-log::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 4px; }
         .log-entry {
             display: flex;
@@ -597,7 +602,7 @@
                 <div class="logo-icon">🌐</div>
                 <div class="logo-text">
                     <h1>ECHOPLEX</h1>
-                    <span>🔴 Personal Network Scanner · Scan ANY IP Range</span>
+                    <span>🔴 Personal IP Scanner · Scan Specific IPs</span>
                 </div>
             </div>
             <div class="header-status">
@@ -616,11 +621,11 @@
 
         <!-- ===== WELCOME SECTION ===== -->
         <div class="welcome-section">
-            <h2>🔍 Enter ANY IP Range to Scan</h2>
-            <p>Scan your home network, office network, or any IP range. You see YOUR devices only.</p>
+            <h2>🔍 Enter ANY IP Address to Scan</h2>
+            <p>Scan specific IPs: 192.168.1.1, 10.0.0.1, or any device on your network</p>
             <div class="features">
-                <span>🔒 Your IP Range</span>
-                <span>🌐 Any Network</span>
+                <span>🔒 Specific IPs</span>
+                <span>🌐 Any Device</span>
                 <span>🧠 Quantum AI</span>
                 <span>🛡️ Real-Time</span>
                 <span>📊 Topology Map</span>
@@ -632,17 +637,17 @@
             <div class="stat-card">
                 <div class="stat-label">Total Devices</div>
                 <div class="stat-value info" id="totalDevices">0</div>
-                <div class="stat-sub">📱 In scanned range</div>
+                <div class="stat-sub">📱 Scanned</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Active Devices</div>
+                <div class="stat-label">Online Devices</div>
                 <div class="stat-value success" id="realDevices">0</div>
-                <div class="stat-sub">🌐 Found in range</div>
+                <div class="stat-sub">🌐 Active</div>
             </div>
             <div class="stat-card">
                 <div class="stat-label">Threats Found</div>
                 <div class="stat-value danger" id="totalThreats">0</div>
-                <div class="stat-sub">⚠️ In scanned range</div>
+                <div class="stat-sub">⚠️ Detected</div>
             </div>
             <div class="stat-card">
                 <div class="stat-label">Quantum Status</div>
@@ -652,7 +657,7 @@
             <div class="stat-card">
                 <div class="stat-label">AI Confidence</div>
                 <div class="stat-value purple" id="aiConfidence">99.8%</div>
-                <div class="stat-sub">🧠 For your scan</div>
+                <div class="stat-sub">🧠 Analysis</div>
             </div>
             <div class="stat-card">
                 <div class="stat-label">Scan Status</div>
@@ -673,7 +678,7 @@
                         <span class="badge" id="scanStatusBadge">🟢 Ready</span>
                     </div>
                     <div class="panel-actions">
-                        <button class="btn btn-success" onclick="scanIPRange()">🔍 Scan IP Range</button>
+                        <button class="btn btn-success" onclick="scanSpecificIP()">🔍 Scan IP</button>
                         <button class="btn btn-primary" onclick="startDemoScan()">🎮 Demo</button>
                         <button class="btn btn-warning" onclick="simulateThreat()">⚡ Test Threat</button>
                     </div>
@@ -682,19 +687,19 @@
                     <!-- ===== IP INPUT SECTION ===== -->
                     <div class="ip-input-section">
                         <div class="ip-row">
-                            <label>IP Range:</label>
-                            <input type="text" id="ipRangeInput" placeholder="192.168.1.0/24" value="192.168.1.0/24">
-                            <button class="btn btn-success" onclick="scanIPRange()" style="font-size:10px;">🚀 Scan</button>
-                            <span class="scan-range-badge" id="rangeBadge">📡 192.168.1.0/24</span>
+                            <label>IP Address:</label>
+                            <input type="text" id="ipInput" placeholder="192.168.1.1" value="192.168.1.1">
+                            <button class="btn btn-success" onclick="scanSpecificIP()" style="font-size:10px;">🚀 Scan</button>
+                            <span class="scan-badge" id="ipBadge">📡 192.168.1.1</span>
                         </div>
                         <div class="preset-ips">
                             <span style="font-size:9px;color:var(--text-muted);margin-right:4px;">Quick:</span>
-                            <button class="preset-btn" onclick="setIPRange('192.168.1.0/24')">🏠 Home</button>
-                            <button class="preset-btn" onclick="setIPRange('10.0.0.0/24')">🏢 Office</button>
-                            <button class="preset-btn" onclick="setIPRange('172.16.0.0/24')">🌐 Corporate</button>
-                            <button class="preset-btn" onclick="setIPRange('192.168.0.0/24')">📡 Router</button>
-                            <button class="preset-btn" onclick="setIPRange('127.0.0.1/32')">💻 Localhost</button>
-                            <button class="preset-btn" onclick="setIPRange('')">🔄 Auto</button>
+                            <button class="preset-btn" onclick="setIP('192.168.1.1')">🏠 Router</button>
+                            <button class="preset-btn" onclick="setIP('192.168.1.100')">💻 PC</button>
+                            <button class="preset-btn" onclick="setIP('192.168.1.101')">📱 Phone</button>
+                            <button class="preset-btn" onclick="setIP('192.168.1.102')">📺 Smart TV</button>
+                            <button class="preset-btn" onclick="setIP('10.0.0.1')">🌐 Office</button>
+                            <button class="preset-btn" onclick="setIP('127.0.0.1')">🔄 Localhost</button>
                         </div>
                     </div>
 
@@ -716,7 +721,7 @@
             <div class="panel">
                 <div class="panel-header">
                     <div class="panel-title">
-                        📱 Devices Found
+                        📱 Devices
                         <span class="badge personal">👤 YOURS</span>
                         <span class="badge" id="deviceCountBadge">0 found</span>
                         <span class="badge" id="threatCountBadge" style="display:none;"></span>
@@ -729,8 +734,8 @@
                 <div class="panel-body">
                     <div class="device-list" id="deviceList">
                         <div class="text-center text-muted" style="padding:30px 0;">
-                            🔍 Enter an IP range above and click Scan<br>
-                            <span style="font-size:10px;">Example: 192.168.1.0/24 scans your home network</span>
+                            🔍 Enter an IP address above and click Scan<br>
+                            <span style="font-size:10px;">Example: 192.168.1.1 scans your router</span>
                         </div>
                     </div>
                 </div>
@@ -755,9 +760,9 @@
                 <div class="panel-body" style="padding:12px;">
                     <div class="ai-thoughts" id="aiThoughts">
                         <div class="thought">
-                            <span class="thought-timestamp">[INIT]</span> ⚡ ECHOPLEX Personal Scanner Ready<br>
-                            <span class="thought-timestamp">[INIT]</span> 🔍 Enter an IP range to scan<br>
-                            <span class="thought-timestamp">[INIT]</span> 🌐 Examples: 192.168.1.0/24, 10.0.0.0/24
+                            <span class="thought-timestamp">[INIT]</span> ⚡ ECHOPLEX IP Scanner Ready<br>
+                            <span class="thought-timestamp">[INIT]</span> 🔍 Enter any IP to scan<br>
+                            <span class="thought-timestamp">[INIT]</span> 🌐 Examples: 192.168.1.1, 10.0.0.1
                         </div>
                     </div>
                 </div>
@@ -820,26 +825,22 @@
 
         <!-- ===== FOOTER ===== -->
         <div style="margin-top:14px;padding:10px 20px;background:rgba(17,24,39,0.9);border-radius:12px;border:1px solid rgba(255,255,255,0.05);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font-size:9px;color:var(--text-muted);">
-            <span>⚡ ECHOPLEX v5.0 · 👤 Personal Edition · Scan ANY IP Range · Your data stays yours</span>
+            <span>⚡ ECHOPLEX v5.0 · 👤 Personal IP Scanner · Scan Specific IPs · Your data stays yours</span>
             <span id="footerTimestamp">Last update: --</span>
         </div>
     </div>
 
     <script>
         // ============================================================
-        //  👤 PERSONAL EDITION - SCAN ANY IP RANGE
+        //  👤 PERSONAL IP SCANNER - SCAN SPECIFIC IPS
         //  YOUR DATA STAYS ON YOUR DEVICE
         // ============================================================
         
         const CONFIG = {
-            // 👤 YOUR QUANTUM API KEY (Optional)
             quantumApiKey: '',
-            // 🌐 Backend server
             backendUrl: 'https://echoplex-net-solutions.onrender.com',
-            // 👤 User ID
             userId: 'Guest_' + Math.random().toString(36).substr(2, 6),
-            // Default IP range
-            defaultIPRange: '192.168.1.0/24'
+            defaultIP: '192.168.1.1'
         };
 
         // ============================================================
@@ -863,7 +864,7 @@
             realDeviceCount: 0,
             userName: 'Guest',
             sessionId: CONFIG.userId,
-            currentIPRange: CONFIG.defaultIPRange,
+            currentIP: CONFIG.defaultIP,
             scanCount: 0
         };
 
@@ -897,7 +898,7 @@
         const backendStatus = $('backendStatus');
         const backendApiStatus = $('backendApiStatus');
         const quantumApiStatus = $('quantumApiStatus');
-        const rangeBadge = $('rangeBadge');
+        const ipBadge = $('ipBadge');
         const userIdDisplay = $('userIdDisplay');
         const flashOverlay = $('flashOverlay');
         const toast = $('toast');
@@ -908,7 +909,7 @@
         const backendUrlInput = $('backendUrl');
         const quantumApiKeyInput = $('quantumApiKey');
         const userNameInput = $('userName');
-        const ipRangeInput = $('ipRangeInput');
+        const ipInput = $('ipInput');
 
         // ============================================================
         //  USER FUNCTIONS
@@ -922,25 +923,20 @@
         }
 
         // ============================================================
-        //  IP RANGE FUNCTIONS
+        //  IP FUNCTIONS
         // ============================================================
-        function setIPRange(range) {
-            ipRangeInput.value = range;
-            rangeBadge.textContent = `📡 ${range || 'Auto'}`;
-            if (range) {
-                state.currentIPRange = range;
-                addAIThought(`📡 IP range set to: ${range}`);
-            } else {
-                state.currentIPRange = '';
-                addAIThought('📡 IP range set to: Auto-detect');
-            }
+        function setIP(ip) {
+            ipInput.value = ip;
+            ipBadge.textContent = `📡 ${ip}`;
+            state.currentIP = ip;
+            addAIThought(`📡 IP set to: ${ip}`);
         }
 
-        function updateIPRange() {
-            const range = ipRangeInput.value.trim() || CONFIG.defaultIPRange;
-            state.currentIPRange = range;
-            rangeBadge.textContent = `📡 ${range}`;
-            addAIThought(`📡 IP range updated to: ${range}`);
+        function updateIP() {
+            const ip = ipInput.value.trim() || CONFIG.defaultIP;
+            state.currentIP = ip;
+            ipBadge.textContent = `📡 ${ip}`;
+            addAIThought(`📡 IP updated to: ${ip}`);
         }
 
         // ============================================================
@@ -1045,30 +1041,30 @@
         }
 
         // ============================================================
-        //  SCAN IP RANGE - USER ENTERS ANY IP RANGE
+        //  SCAN SPECIFIC IP
         // ============================================================
-        async function scanIPRange() {
+        async function scanSpecificIP() {
             if (state.isScanning) {
                 showToast('⏳ Scan Running', 'Please wait');
                 return;
             }
 
-            // Get IP range from input
-            let range = ipRangeInput.value.trim();
-            if (!range) {
-                range = CONFIG.defaultIPRange;
-                ipRangeInput.value = range;
+            // Get IP from input
+            let ip = ipInput.value.trim();
+            if (!ip) {
+                ip = CONFIG.defaultIP;
+                ipInput.value = ip;
             }
             
-            // Validate IP range format
-            const ipPattern = /^(\d{1,3}\.){3}\d{1,3}(\/\d{1,2})?$/;
-            if (!ipPattern.test(range) && range !== '') {
-                showToast('❌ Invalid IP', 'Please enter valid IP range (e.g., 192.168.1.0/24)');
+            // Validate IP format
+            const ipPattern = /^(\d{1,3}\.){3}\d{1,3}$/;
+            if (!ipPattern.test(ip)) {
+                showToast('❌ Invalid IP', 'Please enter a valid IP address (e.g., 192.168.1.1)');
                 return;
             }
 
-            state.currentIPRange = range;
-            rangeBadge.textContent = `📡 ${range}`;
+            state.currentIP = ip;
+            ipBadge.textContent = `📡 ${ip}`;
             state.scanCount++;
 
             if (!state.backendOnline) {
@@ -1085,13 +1081,12 @@
             scanStatusValue.textContent = '🔄';
             scanStatusText.textContent = 'Scanning...';
             
-            addAIThought(`🌐 Scanning IP range: ${range}`);
-            addAIThought(`👤 ${state.userName} is scanning their network`);
-            addLogEntry(`🌐 Scanning: ${range}`, 'info');
+            addAIThought(`🌐 Scanning IP: ${ip}`);
+            addLogEntry(`🌐 Scanning IP: ${ip}`, 'info');
 
             try {
-                // If backend supports custom range
-                const url = `${CONFIG.backendUrl}/api/scan-network?range=${encodeURIComponent(range)}`;
+                // Use the backend to scan the specific IP
+                const url = `${CONFIG.backendUrl}/api/scan-ip?ip=${encodeURIComponent(ip)}`;
                 const response = await fetch(url, {
                     method: 'GET',
                     headers: { 'Content-Type': 'application/json' }
@@ -1102,51 +1097,71 @@
                 }
 
                 const data = await response.json();
-                const devices = data.devices || data;
+                const device = data.device || data;
                 
-                if (!devices || devices.length === 0) {
-                    addAIThought(`⚠️ No devices found in ${range}`);
-                    showToast('⚠️ No Devices', `No active devices found in ${range}`);
+                if (!device || device.error) {
+                    addAIThought(`⚠️ No device found at ${ip}`);
+                    showToast('⚠️ No Device', `No active device found at ${ip}`);
                     state.isScanning = false;
                     scanStatusBadge.textContent = '🟢 Ready';
                     scanStatusBadge.style.color = 'var(--primary)';
                     scanStatusValue.textContent = '⏳';
-                    scanStatusText.textContent = 'No devices';
+                    scanStatusText.textContent = 'No device';
                     return;
                 }
 
-                // Clear previous devices? Only if user wants to replace
-                // Let's keep them and add new ones
-                let foundCount = 0;
-                devices.forEach(device => {
-                    const exists = state.devices.some(d => d.ip === device.ip);
-                    if (!exists) {
-                        state.devices.push({
-                            id: ++state.deviceIdCounter,
-                            name: device.hostname || device.ip,
-                            type: device.type || '💻 Device',
-                            ip: device.ip,
-                            mac: device.mac || 'Unknown',
-                            os: device.os || 'Unknown',
-                            status: 'safe',
-                            threat: null,
-                            isReal: true,
-                            isMyDevice: false,
-                            quantumProtected: state.quantumConnected,
-                            lastSeen: new Date().toISOString(),
-                            traffic: Math.floor(Math.random() * 100) + 10
-                        });
-                        foundCount++;
+                // Check if device already exists
+                const exists = state.devices.some(d => d.ip === device.ip);
+                if (!exists) {
+                    const newDevice = {
+                        id: ++state.deviceIdCounter,
+                        name: device.hostname || device.ip,
+                        type: device.type || '💻 Device',
+                        ip: device.ip,
+                        mac: device.mac || 'Unknown',
+                        os: device.os || 'Unknown',
+                        status: 'safe',
+                        threat: null,
+                        isReal: true,
+                        isMyDevice: false,
+                        quantumProtected: state.quantumConnected,
+                        lastSeen: new Date().toISOString(),
+                        traffic: Math.floor(Math.random() * 100) + 10
+                    };
+                    state.devices.push(newDevice);
+                    state.realDeviceCount++;
+                    
+                    // Simulate threat detection (10% chance)
+                    if (Math.random() < 0.1) {
+                        const threats = [
+                            'Open Ports Detected',
+                            'Suspicious Activity',
+                            'Unsecured Service',
+                            'Potential Vulnerability'
+                        ];
+                        newDevice.status = 'warning';
+                        newDevice.threat = threats[Math.floor(Math.random() * threats.length)];
+                        state.totalDetected++;
+                        addLogEntry(`⚠️ ${newDevice.threat} on ${newDevice.name}`, 'warning');
                     }
-                });
+                    
+                    addAIThought(`✅ Found device: ${newDevice.name} at ${ip}`);
+                    addLogEntry(`✅ Found ${newDevice.name} at ${ip}`, 'success');
+                    showToast(`✅ Device Found`, `${newDevice.name} at ${ip}`);
 
-                state.realDeviceCount = foundCount;
-                addAIThought(`✅ Found ${foundCount} devices in ${range}!`);
-                addLogEntry(`✅ Found ${foundCount} devices in ${range}`, 'success');
-                showToast(`✅ ${foundCount} Devices Found`, `In ${range}`);
+                    if (state.quantumConnected) {
+                        applyQuantumProtection();
+                    }
 
-                if (state.quantumConnected) {
-                    applyQuantumProtection();
+                } else {
+                    // Update existing device
+                    const existing = state.devices.find(d => d.ip === device.ip);
+                    if (existing) {
+                        existing.lastSeen = new Date().toISOString();
+                        existing.name = device.hostname || existing.name;
+                        addAIThought(`✅ Updated device: ${existing.name} at ${ip}`);
+                        showToast('✅ Device Updated', `${existing.name} refreshed`);
+                    }
                 }
 
                 updateDeviceList();
@@ -1156,7 +1171,7 @@
                 setTimeout(() => flashOverlay.className = 'flash-overlay', 500);
 
             } catch (error) {
-                addAIThought(`❌ Error: ${error.message}`);
+                addAIThought(`❌ Error scanning ${ip}: ${error.message}`);
                 showToast('❌ Scan Failed', error.message);
                 addLogEntry(`❌ Scan error: ${error.message}`, 'critical');
             }
@@ -1169,7 +1184,7 @@
         }
 
         // ============================================================
-        //  DEMO SCAN (Simulated)
+        //  DEMO SCAN
         // ============================================================
         function startDemoScan() {
             if (state.isScanning) return;
@@ -1179,25 +1194,36 @@
             scanStatusText.textContent = 'Demo';
             
             addAIThought(`🔍 Running demo scan...`);
-            const count = 2 + Math.floor(Math.random() * 4);
-            const range = ipRangeInput.value.trim() || '192.168.1.0/24';
+            const ip = ipInput.value.trim() || '192.168.1.1';
             
-            for (let i = 0; i < count; i++) {
-                const device = generateDemoDevice(range);
-                if (Math.random() < 0.08) {
-                    const threat = CONFIG.threatDatabase[Math.floor(Math.random() * CONFIG.threatDatabase.length)];
-                    device.status = 'danger';
-                    device.threat = threat.name;
-                    state.totalDetected++;
-                    addLogEntry(`⚠️ ${threat.name} detected on ${device.name}`, 'critical');
-                }
-                if (state.quantumConnected) {
-                    device.quantumProtected = true;
-                }
-                state.devices.push(device);
+            const device = {
+                id: ++state.deviceIdCounter,
+                name: 'Demo Device',
+                type: '💻 Workstation',
+                ip: ip,
+                mac: 'AA:BB:CC:DD:EE:FF',
+                os: 'Windows 11',
+                status: 'safe',
+                threat: null,
+                isReal: false,
+                isMyDevice: false,
+                quantumProtected: state.quantumConnected,
+                lastSeen: new Date().toISOString(),
+                traffic: 45
+            };
+            
+            if (Math.random() < 0.2) {
+                const threats = ['Open Ports Detected', 'Suspicious Activity', 'Unsecured Service'];
+                device.status = 'warning';
+                device.threat = threats[Math.floor(Math.random() * threats.length)];
+                state.totalDetected++;
+                addLogEntry(`⚠️ ${device.threat} on ${device.name}`, 'warning');
             }
             
-            addAIThought(`✅ Demo scan complete: ${count} devices added`);
+            state.devices.push(device);
+            state.realDeviceCount++;
+            
+            addAIThought(`✅ Demo scan complete: ${device.name} added`);
             updateDeviceList();
             updateStats();
             drawTopology();
@@ -1206,44 +1232,7 @@
             scanStatusBadge.textContent = '🟢 Ready';
             scanStatusValue.textContent = '✅';
             scanStatusText.textContent = 'Demo Complete';
-            showToast('✅ Demo Complete', `${count} devices added`);
-        }
-
-        function generateDemoDevice(range) {
-            const types = CONFIG.deviceTypes;
-            const type = types[Math.floor(Math.random() * types.length)];
-            
-            // Parse range to generate IP
-            let baseIP = '192.168.1';
-            if (range && range.includes('/')) {
-                const parts = range.split('/')[0].split('.');
-                if (parts.length === 4) {
-                    baseIP = parts.slice(0, 3).join('.');
-                }
-            }
-            const ip = `${baseIP}.${10 + Math.floor(Math.random() * 200)}`;
-            
-            const mac = Array.from({length:6}, () => 
-                Math.floor(Math.random() * 256).toString(16).padStart(2,'0').toUpperCase()
-            ).join(':');
-            const hostnames = ['DESKTOP', 'LAPTOP', 'SERVER', 'WORKSTATION', 'PHONE', 'TABLET'];
-            const hostname = hostnames[Math.floor(Math.random() * hostnames.length)];
-            
-            return {
-                id: ++state.deviceIdCounter,
-                name: `${type} ${hostname}`,
-                type: type,
-                ip: ip,
-                mac: mac,
-                os: ['Windows 11', 'macOS', 'Ubuntu', 'Android', 'iOS'][Math.floor(Math.random() * 5)],
-                status: 'safe',
-                threat: null,
-                isReal: false,
-                isMyDevice: Math.random() < 0.1,
-                quantumProtected: false,
-                lastSeen: new Date().toISOString(),
-                traffic: Math.floor(Math.random() * 100) + 10
-            };
+            showToast('✅ Demo Complete', `Added ${device.name}`);
         }
 
         // ============================================================
@@ -1252,7 +1241,7 @@
         function runQuantumAnalysis() {
             if (!state.quantumConnected) {
                 showToast('ℹ️ Optional', 'Connect Quantum API for analysis');
-                addAIThought('ℹ️ Quantum API is optional. Connect if you have one.');
+                addAIThought('ℹ️ Quantum API is optional.');
                 return;
             }
             
@@ -1260,11 +1249,11 @@
             addLogEntry(`🧠 Quantum analysis started`, 'quantum');
 
             const analysisSteps = [
-                'Analyzing network patterns',
+                'Analyzing device patterns',
                 'Processing threats',
                 'Evaluating risk scores',
                 'Predicting attacks',
-                'Verifying security policies',
+                'Verifying security',
                 'Detecting anomalies',
                 'Generating recommendations'
             ];
@@ -1422,18 +1411,19 @@
                 return;
             }
             const device = safe[Math.floor(Math.random() * safe.length)];
-            const threat = CONFIG.threatDatabase[Math.floor(Math.random() * CONFIG.threatDatabase.length)];
-            device.status = 'danger';
-            device.threat = threat.name;
+            const threats = ['Open Ports Detected', 'Suspicious Activity', 'Unsecured Service', 'Potential Vulnerability'];
+            const threat = threats[Math.floor(Math.random() * threats.length)];
+            device.status = 'warning';
+            device.threat = threat;
             state.totalDetected++;
-            addLogEntry(`⚠️ ${threat.name} on ${device.name}`, 'critical');
-            addAIThought(`🔥 ${threat.name} detected on ${device.name}`);
+            addLogEntry(`⚠️ ${threat} on ${device.name}`, 'warning');
+            addAIThought(`🔥 ${threat} detected on ${device.name}`);
             flashOverlay.className = 'flash-overlay danger';
             setTimeout(() => flashOverlay.className = 'flash-overlay', 400);
             
             if (state.quantumConnected && Math.random() < 0.5) {
                 setTimeout(() => {
-                    if (device.status === 'danger') {
+                    if (device.status === 'warning') {
                         device.status = 'safe';
                         device.threat = null;
                         device.quantumProtected = true;
@@ -1450,7 +1440,7 @@
             updateDeviceList();
             updateStats();
             drawTopology();
-            showToast('🔴 Threat Detected', `${threat.name} on ${device.name}`);
+            showToast('⚠️ Threat Detected', `${threat} on ${device.name}`);
         }
 
         // ============================================================
@@ -1458,7 +1448,7 @@
         // ============================================================
         function updateDeviceList() {
             const active = state.devices.filter(d => d.status !== 'blocked');
-            const threats = state.devices.filter(d => d.status === 'danger');
+            const threats = state.devices.filter(d => d.status === 'danger' || d.status === 'warning');
             
             deviceCountBadge.textContent = `${active.length} online`;
             if (threats.length > 0) {
@@ -1473,7 +1463,7 @@
                 deviceList.innerHTML = `
                     <div class="text-center text-muted" style="padding:30px 0;">
                         🔍 No devices found<br>
-                        <span style="font-size:10px;">Enter an IP range and click "Scan"</span>
+                        <span style="font-size:10px;">Enter an IP address and click "Scan"</span>
                     </div>
                 `;
                 return;
@@ -1521,7 +1511,7 @@
                             ` : `
                                 <button class="btn btn-success" onclick="unblockDevice(${device.id})">Unblock</button>
                             `}
-                            ${device.status === 'danger' ? `
+                            ${device.status === 'danger' || device.status === 'warning' ? `
                                 <button class="btn btn-success" onclick="resolveDevice(${device.id})">Resolve</button>
                             ` : ''}
                             ${!device.quantumProtected && state.quantumConnected && device.status !== 'blocked' ? `
@@ -1554,7 +1544,7 @@
 
         function updateStats() {
             const total = state.devices.length;
-            const threats = state.devices.filter(d => d.status === 'danger').length;
+            const threats = state.devices.filter(d => d.status === 'danger' || d.status === 'warning').length;
             const real = state.devices.filter(d => d.isReal).length;
             const blocked = state.devices.filter(d => d.status === 'blocked').length;
             const quantumProtected = state.devices.filter(d => d.quantumProtected).length;
@@ -1570,13 +1560,13 @@
             networkHealth.style.color = state.networkHealth > 80 ? 'var(--success)' : state.networkHealth > 50 ? 'var(--warning)' : 'var(--danger)';
 
             if (threats > 0) {
-                systemStatusDot.className = 'status-dot red';
-                systemStatusText.textContent = `⚠️ ${threats} Threats`;
-                systemStatusText.style.color = 'var(--danger)';
-                aiStatus.textContent = state.quantumConnected ? '🔴 Quantum' : '🔴 Responding';
+                systemStatusDot.className = 'status-dot yellow';
+                systemStatusText.textContent = `⚠️ ${threats} Issues`;
+                systemStatusText.style.color = 'var(--warning)';
+                aiStatus.textContent = state.quantumConnected ? '🟣 Quantum' : '🟡 Monitoring';
             } else if (quantumProtected > 0) {
                 systemStatusDot.className = 'status-dot green';
-                systemStatusText.textContent = `🛡️ ${quantumProtected} Quantum Protected`;
+                systemStatusText.textContent = `🛡️ ${quantumProtected} Protected`;
                 systemStatusText.style.color = 'var(--secondary)';
                 aiStatus.textContent = state.quantumConnected ? '🟣 Quantum' : '🟢 Secure';
             } else {
@@ -1596,13 +1586,9 @@
                 quantumStatusValue.style.color = 'var(--warning)';
             }
 
-            const baseConfidence = 99.8 - (threats * 0.05) - (warningsCount() * 0.02) + (quantumProtected * 0.01);
+            const baseConfidence = 99.8 - (threats * 0.05) + (quantumProtected * 0.01);
             state.aiConfidence = Math.min(99.99, Math.max(90, baseConfidence));
             aiConfidence.textContent = state.aiConfidence.toFixed(1) + '%';
-        }
-
-        function warningsCount() {
-            return state.devices.filter(d => d.status === 'warning').length;
         }
 
         function addLogEntry(msg, type = 'info') {
@@ -1662,7 +1648,7 @@
                 user: state.userName,
                 session: state.sessionId,
                 timestamp: new Date().toISOString(),
-                ipRange: state.currentIPRange,
+                ip: state.currentIP,
                 devices: state.devices,
                 totalDetected: state.totalDetected,
                 networkHealth: state.networkHealth,
@@ -1721,12 +1707,12 @@
         }
 
         // ============================================================
-        //  TOPOLOGY DRAWING
+        //  TOPOLOGY DRAWING - FIXED WITH PROPER VISUALIZATION
         // ============================================================
         function resizeTopology() {
             const rect = topologyCanvas.parentElement.getBoundingClientRect();
             topologyCanvas.width = rect.width - 4;
-            topologyCanvas.height = 380;
+            topologyCanvas.height = 400;
         }
 
         function drawTopology() {
@@ -1735,28 +1721,61 @@
             if (w === 0 || h === 0) { requestAnimationFrame(drawTopology); return; }
 
             ctx.clearRect(0, 0, w, h);
+            
+            // Background with gradient
             const grad = ctx.createRadialGradient(w/2, h/2, 50, w/2, h/2, w/0.8);
-            grad.addColorStop(0, 'rgba(0, 212, 255, 0.02)');
+            grad.addColorStop(0, 'rgba(0, 212, 255, 0.03)');
             grad.addColorStop(0.5, 'rgba(124, 58, 237, 0.02)');
             grad.addColorStop(1, 'rgba(0, 0, 0, 0.3)');
             ctx.fillStyle = grad;
             ctx.fillRect(0, 0, w, h);
 
-            const cx = w / 2, cy = h / 2;
+            // Draw grid lines
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.02)';
+            ctx.lineWidth = 0.5;
+            for (let i = 0; i < w; i += 50) {
+                ctx.beginPath();
+                ctx.moveTo(i, 0);
+                ctx.lineTo(i, h);
+                ctx.stroke();
+            }
+            for (let i = 0; i < h; i += 50) {
+                ctx.beginPath();
+                ctx.moveTo(0, i);
+                ctx.lineTo(w, i);
+                ctx.stroke();
+            }
+
+            const cx = w / 2;
+            const cy = h / 2;
             const radius = Math.min(w, h) * 0.3;
 
+            // ===== DRAW HUB =====
             // Hub glow
             if (state.quantumConnected) {
-                const quantumGlow = ctx.createRadialGradient(cx, cy, 5, cx, cy, 60);
-                quantumGlow.addColorStop(0, 'rgba(124, 58, 237, 0.2)');
+                const quantumGlow = ctx.createRadialGradient(cx, cy, 5, cx, cy, 70);
+                quantumGlow.addColorStop(0, 'rgba(124, 58, 237, 0.3)');
+                quantumGlow.addColorStop(0.5, 'rgba(124, 58, 237, 0.1)');
                 quantumGlow.addColorStop(1, 'rgba(0, 0, 0, 0)');
                 ctx.fillStyle = quantumGlow;
                 ctx.beginPath();
-                ctx.arc(cx, cy, 60, 0, Math.PI * 2);
+                ctx.arc(cx, cy, 70, 0, Math.PI * 2);
                 ctx.fill();
             }
 
-            // Hub
+            // Hub outer ring
+            ctx.strokeStyle = state.quantumConnected ? 'rgba(124, 58, 237, 0.3)' : 'rgba(0, 212, 255, 0.2)';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([5, 10]);
+            ctx.shadowColor = state.quantumConnected ? 'rgba(124, 58, 237, 0.2)' : 'rgba(0, 212, 255, 0.1)';
+            ctx.shadowBlur = 20;
+            ctx.beginPath();
+            ctx.arc(cx, cy, radius + 15, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.shadowBlur = 0;
+
+            // Hub center
             ctx.fillStyle = 'rgba(0, 212, 255, 0.15)';
             ctx.shadowColor = 'rgba(0, 212, 255, 0.3)';
             ctx.shadowBlur = 40;
@@ -1765,11 +1784,11 @@
             ctx.fill();
             ctx.shadowBlur = 0;
 
-            // Hub ring
-            ctx.strokeStyle = state.quantumConnected ? 'rgba(124, 58, 237, 0.4)' : 'rgba(0, 212, 255, 0.3)';
+            // Hub inner ring
+            ctx.strokeStyle = state.quantumConnected ? 'rgba(124, 58, 237, 0.5)' : 'rgba(0, 212, 255, 0.4)';
             ctx.lineWidth = 2;
             ctx.shadowColor = state.quantumConnected ? 'rgba(124, 58, 237, 0.3)' : 'rgba(0, 212, 255, 0.2)';
-            ctx.shadowBlur = 20;
+            ctx.shadowBlur = 15;
             ctx.beginPath();
             ctx.arc(cx, cy, 25, 0, Math.PI * 2);
             ctx.stroke();
@@ -1777,101 +1796,121 @@
 
             // Hub text
             ctx.fillStyle = state.quantumConnected ? 'var(--secondary)' : '#00d4ff';
-            ctx.font = 'bold 10px Orbitron, monospace';
+            ctx.font = 'bold 11px Orbitron, monospace';
             ctx.textAlign = 'center';
-            const rangeLabel = state.currentIPRange || 'Auto';
-            ctx.fillText(`🌐 ${rangeLabel}`, cx, cy + 4);
+            const ipLabel = state.currentIP || 'ECHOPLEX';
+            ctx.fillText(`🌐 ${ipLabel}`, cx, cy + 4);
             
             ctx.fillStyle = 'rgba(255,255,255,0.2)';
-            ctx.font = '7px monospace';
-            ctx.fillText(`${state.devices.length} devices`, cx, cy + 20);
+            ctx.font = '8px monospace';
+            ctx.fillText(`${state.devices.length} devices`, cx, cy + 22);
+
+            if (state.quantumConnected) {
+                ctx.fillStyle = 'rgba(124, 58, 237, 0.4)';
+                ctx.font = '7px monospace';
+                ctx.fillText('🧠 QUANTUM SECURE', cx, cy + 38);
+            }
 
             if (state.devices.length === 0) {
-                ctx.fillStyle = 'rgba(255,255,255,0.05)';
-                ctx.font = '12px Segoe UI, sans-serif';
-                ctx.fillText('🔍 Enter IP range and click Scan', cx, cy + 55);
+                ctx.fillStyle = 'rgba(255,255,255,0.08)';
+                ctx.font = '13px Segoe UI, sans-serif';
+                ctx.fillText('🔍 Enter IP and click Scan', cx, cy + 65);
                 requestAnimationFrame(drawTopology);
                 return;
             }
 
+            // ===== DRAW DEVICES =====
             const devices = state.devices.slice(0, 25);
-            const angles = devices.map((_, i) => (i / devices.length) * Math.PI * 2 + (Date.now() / 5000));
-
+            const totalDevices = devices.length;
+            
             devices.forEach((device, i) => {
-                const angle = angles[i];
-                const dist = radius * (0.6 + Math.sin(Date.now() / 8000 + i) * 0.08);
+                // Calculate position in a circle
+                const angle = (i / totalDevices) * Math.PI * 2 - Math.PI / 2 + (Date.now() / 8000);
+                const dist = radius * (0.5 + 0.4 * Math.sin(Date.now() / 10000 + i * 0.5));
                 const x = cx + Math.cos(angle) * dist;
                 const y = cy + Math.sin(angle) * dist;
 
-                const color = device.status === 'danger' ? 'rgba(255,0,64,0.4)' :
-                             device.status === 'warning' ? 'rgba(255,170,0,0.3)' :
-                             device.status === 'blocked' ? 'rgba(107,122,143,0.3)' :
-                             device.quantumProtected ? 'rgba(124,58,237,0.4)' :
-                             device.isMyDevice ? 'rgba(0,212,255,0.5)' :
-                             device.isReal ? 'rgba(0,212,255,0.3)' : 'rgba(0,255,136,0.15)';
-
-                ctx.strokeStyle = color;
-                ctx.lineWidth = device.status === 'danger' ? 2 : 
+                // Connection line
+                const lineColor = device.status === 'danger' ? 'rgba(255,0,64,0.5)' :
+                                 device.status === 'warning' ? 'rgba(255,170,0,0.4)' :
+                                 device.status === 'blocked' ? 'rgba(107,122,143,0.3)' :
+                                 device.quantumProtected ? 'rgba(124,58,237,0.4)' :
+                                 'rgba(0,212,255,0.2)';
+                
+                ctx.strokeStyle = lineColor;
+                ctx.lineWidth = device.status === 'danger' ? 2.5 : 
                                device.quantumProtected ? 2 : 
-                               device.isMyDevice ? 2.5 :
                                device.isReal ? 1.5 : 1;
-                ctx.shadowColor = device.quantumProtected ? 'rgba(124,58,237,0.4)' :
-                                 device.isMyDevice ? 'rgba(0,212,255,0.5)' :
+                
+                ctx.shadowColor = device.quantumProtected ? 'rgba(124,58,237,0.3)' :
                                  device.status === 'danger' ? 'rgba(255,0,64,0.3)' : 'rgba(0,212,255,0.1)';
-                ctx.shadowBlur = device.quantumProtected ? 20 : 
-                                device.isMyDevice ? 25 : 10;
+                ctx.shadowBlur = device.quantumProtected ? 15 : 10;
+                
                 ctx.beginPath();
                 ctx.moveTo(cx, cy);
-                ctx.lineTo(x, y);
+                
+                // Curved line
+                const midAngle = (angle + (i / totalDevices) * Math.PI * 2) / 2;
+                const midDist = dist * 0.6;
+                const midX = cx + Math.cos(midAngle) * midDist;
+                const midY = cy + Math.sin(midAngle) * midDist;
+                
+                ctx.quadraticCurveTo(midX, midY, x, y);
                 ctx.stroke();
                 ctx.shadowBlur = 0;
 
+                // Device dot
                 const dotColor = device.status === 'danger' ? '#ff0040' :
                                 device.status === 'warning' ? '#ffaa00' :
                                 device.status === 'blocked' ? '#6b7a8f' :
-                                device.isMyDevice ? '#00d4ff' :
                                 device.quantumProtected ? '#8b5cf6' :
                                 device.isReal ? '#00d4ff' : '#00ff88';
                 
-                const dotSize = device.status === 'danger' ? 10 : 
-                               device.isMyDevice ? 10 :
-                               device.quantumProtected ? 9 :
-                               device.isReal ? 8 : 6;
+                const dotSize = device.status === 'danger' ? 12 : 
+                               device.quantumProtected ? 10 :
+                               device.isReal ? 9 : 8;
                 
-                ctx.shadowColor = device.isMyDevice ? 'rgba(0,212,255,0.6)' :
-                                 device.quantumProtected ? 'rgba(124,58,237,0.6)' :
+                // Glow
+                ctx.shadowColor = device.quantumProtected ? 'rgba(124,58,237,0.6)' :
+                                 device.status === 'danger' ? 'rgba(255,0,64,0.5)' :
                                  device.isReal ? 'rgba(0,212,255,0.4)' : 'rgba(0,255,136,0.2)';
-                ctx.shadowBlur = device.isMyDevice ? 30 : 
-                                device.quantumProtected ? 25 : 15;
+                ctx.shadowBlur = device.quantumProtected ? 25 : 
+                                device.status === 'danger' ? 20 : 15;
+                
                 ctx.fillStyle = dotColor;
                 ctx.beginPath();
                 ctx.arc(x, y, dotSize, 0, Math.PI * 2);
                 ctx.fill();
                 ctx.shadowBlur = 0;
 
-                // Your Device ring
-                if (device.isMyDevice) {
-                    ctx.strokeStyle = 'rgba(0, 212, 255, 0.6)';
-                    ctx.lineWidth = 2;
-                    ctx.setLineDash([2, 3]);
+                // Pulse animation for threats
+                if (device.status === 'danger' || device.status === 'warning') {
+                    const pulseRadius = dotSize + 8 + Math.sin(Date.now() / 500 + i) * 4;
+                    ctx.strokeStyle = device.status === 'danger' ? 'rgba(255,0,64,0.3)' : 'rgba(255,170,0,0.3)';
+                    ctx.lineWidth = 1.5;
+                    ctx.shadowColor = device.status === 'danger' ? 'rgba(255,0,64,0.2)' : 'rgba(255,170,0,0.2)';
+                    ctx.shadowBlur = 10;
                     ctx.beginPath();
-                    ctx.arc(x, y, dotSize + 10, 0, Math.PI * 2);
+                    ctx.arc(x, y, pulseRadius, 0, Math.PI * 2);
                     ctx.stroke();
-                    ctx.setLineDash([]);
+                    ctx.shadowBlur = 0;
                 }
 
                 // Quantum ring
                 if (device.quantumProtected) {
                     ctx.strokeStyle = 'rgba(124, 58, 237, 0.4)';
-                    ctx.lineWidth = 1;
+                    ctx.lineWidth = 1.5;
                     ctx.setLineDash([2, 4]);
+                    ctx.shadowColor = 'rgba(124, 58, 237, 0.2)';
+                    ctx.shadowBlur = 10;
                     ctx.beginPath();
                     ctx.arc(x, y, dotSize + 8, 0, Math.PI * 2);
                     ctx.stroke();
                     ctx.setLineDash([]);
+                    ctx.shadowBlur = 0;
                 }
 
-                // Real tag ring
+                // Real device ring
                 if (device.isReal) {
                     ctx.strokeStyle = 'rgba(0,212,255,0.3)';
                     ctx.lineWidth = 1;
@@ -1882,52 +1921,58 @@
                     ctx.setLineDash([]);
                 }
 
+                // Device label
                 ctx.fillStyle = device.status === 'danger' ? '#ff6b8a' : 
-                               device.isMyDevice ? '#00d4ff' :
                                device.quantumProtected ? '#a78bfa' :
                                device.isReal ? '#00d4ff' : '#9ca3af';
-                ctx.font = '7px Segoe UI, sans-serif';
+                ctx.font = '8px Segoe UI, sans-serif';
                 ctx.textAlign = 'center';
-                const label = device.name.length > 12 ? device.name.slice(0,10)+'…' : device.name;
-                ctx.fillText(label, x, y + dotSize + 12);
-                ctx.fillStyle = '#6b7a8f';
-                ctx.font = '6px monospace';
-                ctx.fillText(device.ip, x, y + dotSize + 22);
+                const label = device.name.length > 14 ? device.name.slice(0,12)+'…' : device.name;
+                ctx.fillText(label, x, y + dotSize + 16);
                 
+                ctx.fillStyle = '#6b7a8f';
+                ctx.font = '7px monospace';
+                ctx.fillText(device.ip, x, y + dotSize + 28);
+                
+                // Threat badge
                 if (device.threat) {
-                    ctx.fillStyle = '#ff0040';
-                    ctx.font = '6px Segoe UI, sans-serif';
-                    ctx.fillText('⚠ ' + device.threat.slice(0,8), x, y - dotSize - 6);
+                    ctx.fillStyle = device.status === 'danger' ? '#ff0040' : '#ffaa00';
+                    ctx.font = '7px Segoe UI, sans-serif';
+                    ctx.fillText('⚠ ' + device.threat.slice(0,10), x, y - dotSize - 8);
                 }
 
+                // Icons
                 if (device.isMyDevice) {
-                    ctx.fillStyle = 'rgba(0, 212, 255, 0.7)';
-                    ctx.font = '6px monospace';
-                    ctx.fillText('👤 YOU', x + dotSize + 12, y);
+                    ctx.fillStyle = 'rgba(0, 212, 255, 0.8)';
+                    ctx.font = '7px monospace';
+                    ctx.fillText('👤', x + dotSize + 14, y + 4);
                 }
 
                 if (device.quantumProtected) {
-                    ctx.fillStyle = 'rgba(124, 58, 237, 0.5)';
-                    ctx.font = '5px monospace';
-                    ctx.fillText('🧠', x + dotSize + 8, y - 4);
+                    ctx.fillStyle = 'rgba(124, 58, 237, 0.6)';
+                    ctx.font = '7px monospace';
+                    ctx.fillText('🧠', x + dotSize + 14, y - 6);
                 }
             });
 
-            // Scanning ring animation
+            // ===== SCANNING ANIMATION =====
             const scanAngle = (Date.now() / 4000) % (Math.PI * 2);
-            ctx.strokeStyle = state.quantumConnected ? 'rgba(124, 58, 237, 0.2)' : 'rgba(0, 212, 255, 0.1)';
-            ctx.lineWidth = 1;
-            ctx.setLineDash([4, 8]);
+            ctx.strokeStyle = state.quantumConnected ? 'rgba(124, 58, 237, 0.2)' : 'rgba(0, 212, 255, 0.15)';
+            ctx.lineWidth = 1.5;
+            ctx.setLineDash([5, 10]);
+            ctx.shadowColor = state.quantumConnected ? 'rgba(124, 58, 237, 0.1)' : 'rgba(0, 212, 255, 0.1)';
+            ctx.shadowBlur = 10;
             ctx.beginPath();
-            ctx.arc(cx, cy, radius + 15, scanAngle - 0.3, scanAngle + 0.3);
+            ctx.arc(cx, cy, radius + 20, scanAngle - 0.4, scanAngle + 0.4);
             ctx.stroke();
             ctx.setLineDash([]);
+            ctx.shadowBlur = 0;
 
-            // Device count
-            ctx.fillStyle = 'rgba(255,255,255,0.03)';
+            // ===== DEVICE COUNT =====
+            ctx.fillStyle = 'rgba(255,255,255,0.04)';
             ctx.font = '8px Segoe UI, sans-serif';
             ctx.textAlign = 'right';
-            ctx.fillText(`${state.devices.length} devices in ${state.currentIPRange || 'range'}`, w - 10, h - 10);
+            ctx.fillText(`${state.devices.length} devices · ${state.currentIP}`, w - 10, h - 10);
 
             requestAnimationFrame(drawTopology);
         }
@@ -1942,10 +1987,10 @@
             userIdDisplay.textContent = state.userName;
             userNameInput.value = state.userName;
             
-            // Set default IP range
-            ipRangeInput.value = CONFIG.defaultIPRange;
-            rangeBadge.textContent = `📡 ${CONFIG.defaultIPRange}`;
-            state.currentIPRange = CONFIG.defaultIPRange;
+            // Set default IP
+            ipInput.value = CONFIG.defaultIP;
+            ipBadge.textContent = `📡 ${CONFIG.defaultIP}`;
+            state.currentIP = CONFIG.defaultIP;
             
             // Set backend URL
             backendUrlInput.value = CONFIG.backendUrl;
@@ -1956,19 +2001,33 @@
                 setTimeout(connectQuantumAPI, 1500);
             }
 
-            // Initialize with demo devices
-            for (let i = 0; i < 3; i++) {
-                state.devices.push(generateDemoDevice(CONFIG.defaultIPRange));
-            }
+            // Initialize with a demo device
+            const demoDevice = {
+                id: ++state.deviceIdCounter,
+                name: 'Demo Device',
+                type: '💻 Workstation',
+                ip: CONFIG.defaultIP,
+                mac: 'AA:BB:CC:DD:EE:FF',
+                os: 'Windows 11',
+                status: 'safe',
+                threat: null,
+                isReal: false,
+                isMyDevice: false,
+                quantumProtected: false,
+                lastSeen: new Date().toISOString(),
+                traffic: 45
+            };
+            state.devices.push(demoDevice);
+            state.realDeviceCount++;
             
             updateDeviceList();
             updateStats();
             drawTopology();
 
             addAIThought(`⚡ Welcome ${state.userName}!`);
-            addAIThought(`🌐 Enter any IP range to scan`);
-            addAIThought(`📡 Examples: 192.168.1.0/24, 10.0.0.0/24`);
-            addLogEntry(`🟢 ECHOPLEX Personal Scanner started`, 'success');
+            addAIThought(`🔍 Enter any IP address to scan`);
+            addAIThought(`🌐 Examples: 192.168.1.1, 10.0.0.1`);
+            addLogEntry(`🟢 ECHOPLEX IP Scanner started`, 'success');
 
             window.addEventListener('resize', resizeTopology);
             setInterval(updateClock, 1000);
@@ -1979,7 +2038,7 @@
             setTimeout(checkBackendStatus, 2000);
 
             setTimeout(() => {
-                showToast(`👤 Welcome ${state.userName}`, 'Enter an IP range and click Scan');
+                showToast(`👤 Welcome ${state.userName}`, 'Enter an IP and click Scan');
             }, 1500);
         }
 

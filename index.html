@@ -211,7 +211,7 @@
         /* ===== NETWORK MAP ===== */
         .network-topology {
             position: relative;
-            min-height: 350px;
+            min-height: 380px;
             background: rgba(0,0,0,0.3);
             border-radius: 10px;
             padding: 12px;
@@ -242,6 +242,7 @@
         .legend-dot.danger { background: var(--danger); }
         .legend-dot.blocked { background: #6b7a8f; }
         .legend-dot.quantum { background: var(--secondary); animation: pulse-fast 0.5s infinite; }
+        .legend-dot.hub { background: var(--primary); animation: pulse 2s infinite; }
 
         /* ===== DEVICE LIST ===== */
         .device-list { display: flex; flex-direction: column; gap: 5px; }
@@ -285,6 +286,79 @@
 
         .device-actions { display: flex; gap: 4px; flex-shrink: 0; }
         .device-actions .btn { padding: 2px 8px; font-size: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        /* ===== IP INPUT SECTION ===== */
+        .ip-input-section {
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+            padding: 14px;
+            border: 1px solid rgba(255,255,255,0.05);
+            margin-bottom: 12px;
+        }
+
+        .ip-input-section .ip-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .ip-input-section label {
+            font-size: 11px;
+            color: var(--text-muted);
+            min-width: 80px;
+        }
+
+        .ip-input-section input[type="text"] {
+            flex: 1;
+            padding: 8px 12px;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 6px;
+            color: var(--text);
+            font-family: 'Orbitron', monospace;
+            font-size: 11px;
+            min-width: 200px;
+        }
+
+        .ip-input-section input[type="text"]:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 20px rgba(0,212,255,0.1);
+        }
+
+        .ip-input-section .scan-range-badge {
+            font-size: 9px;
+            padding: 4px 12px;
+            border-radius: 12px;
+            background: rgba(0,212,255,0.1);
+            border: 1px solid rgba(0,212,255,0.2);
+            color: var(--primary);
+        }
+
+        .ip-input-section .preset-ips {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+
+        .ip-input-section .preset-ips .preset-btn {
+            padding: 3px 10px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.05);
+            background: rgba(255,255,255,0.03);
+            color: var(--text-muted);
+            font-size: 9px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .ip-input-section .preset-ips .preset-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: rgba(0,212,255,0.05);
+        }
 
         /* ===== CONFIG SECTION ===== */
         .config-section {
@@ -354,7 +428,7 @@
         .thought-timestamp { color: var(--text-muted); font-size: 8px; font-family: 'Segoe UI', sans-serif; }
 
         /* ===== ALERT LOG ===== */
-        .alert-log { display: flex; flex-direction: column; gap: 3px; max-height: 200px; overflow-y: auto; }
+        .alert-log { display: flex; flex-direction: column; gap: 3px; max-height: 150px; overflow-y: auto; }
         .alert-log::-webkit-scrollbar { width: 4px; }
         .alert-log::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); }
         .alert-log::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 4px; }
@@ -419,6 +493,7 @@
             .topology-legend { bottom: 6px; right: 6px; font-size: 7px; padding: 3px 8px; flex-wrap: wrap; }
             .toast { left: 15px; right: 15px; max-width: none; bottom: 15px; }
             .logo-text h1 { font-size: 18px; }
+            .ip-input-section .ip-row { flex-direction: column; align-items: stretch; }
         }
 
         .text-center { text-align: center; }
@@ -522,13 +597,13 @@
                 <div class="logo-icon">🌐</div>
                 <div class="logo-text">
                     <h1>ECHOPLEX</h1>
-                    <span>🔴 Personal Network Security · Scan YOUR Network</span>
+                    <span>🔴 Personal Network Scanner · Scan ANY IP Range</span>
                 </div>
             </div>
             <div class="header-status">
                 <div class="status-badge">
                     <span class="status-dot green" id="systemStatusDot"></span>
-                    <span id="systemStatusText">All Systems Secure</span>
+                    <span id="systemStatusText">Ready</span>
                 </div>
                 <div class="status-badge">📡 <span id="activeConnections">0</span> Devices</div>
                 <div class="status-badge">👤 <span id="userIdDisplay">Guest</span></div>
@@ -541,33 +616,33 @@
 
         <!-- ===== WELCOME SECTION ===== -->
         <div class="welcome-section">
-            <h2>🔍 Scan YOUR Network - Not Mine!</h2>
-            <p>Every user scans their OWN network. Your data stays on YOUR device. No data is shared.</p>
+            <h2>🔍 Enter ANY IP Range to Scan</h2>
+            <p>Scan your home network, office network, or any IP range. You see YOUR devices only.</p>
             <div class="features">
-                <span>🔒 Your Network Only</span>
-                <span>🌐 Personal Scan</span>
+                <span>🔒 Your IP Range</span>
+                <span>🌐 Any Network</span>
                 <span>🧠 Quantum AI</span>
-                <span>🛡️ Zero-Trust</span>
-                <span>📊 Real-Time</span>
+                <span>🛡️ Real-Time</span>
+                <span>📊 Topology Map</span>
             </div>
         </div>
 
         <!-- ===== STATS ===== -->
         <section class="stats-grid">
             <div class="stat-card">
-                <div class="stat-label">Your Devices</div>
+                <div class="stat-label">Total Devices</div>
                 <div class="stat-value info" id="totalDevices">0</div>
-                <div class="stat-sub">📱 Your personal network</div>
+                <div class="stat-sub">📱 In scanned range</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Your Network</div>
+                <div class="stat-label">Active Devices</div>
                 <div class="stat-value success" id="realDevices">0</div>
-                <div class="stat-sub">🌐 Devices found on YOUR network</div>
+                <div class="stat-sub">🌐 Found in range</div>
             </div>
             <div class="stat-card">
                 <div class="stat-label">Threats Found</div>
                 <div class="stat-value danger" id="totalThreats">0</div>
-                <div class="stat-sub">⚠️ On YOUR network</div>
+                <div class="stat-sub">⚠️ In scanned range</div>
             </div>
             <div class="stat-card">
                 <div class="stat-label">Quantum Status</div>
@@ -577,12 +652,12 @@
             <div class="stat-card">
                 <div class="stat-label">AI Confidence</div>
                 <div class="stat-value purple" id="aiConfidence">99.8%</div>
-                <div class="stat-sub">🧠 For YOUR network</div>
+                <div class="stat-sub">🧠 For your scan</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Network Health</div>
-                <div class="stat-value success" id="networkHealth">100%</div>
-                <div class="stat-sub">📊 YOUR network health</div>
+                <div class="stat-label">Scan Status</div>
+                <div class="stat-value info" id="scanStatusValue">⏳</div>
+                <div class="stat-sub" id="scanStatusText">Ready</div>
             </div>
         </section>
 
@@ -593,25 +668,45 @@
             <div class="panel">
                 <div class="panel-header">
                     <div class="panel-title">
-                        🌐 Your Network Topology
-                        <span class="badge personal">👤 YOUR NETWORK</span>
-                        <span class="badge" id="scanStatusBadge">🟢 Active</span>
+                        🌐 Network Topology
+                        <span class="badge personal">👤 YOUR SCAN</span>
+                        <span class="badge" id="scanStatusBadge">🟢 Ready</span>
                     </div>
                     <div class="panel-actions">
-                        <button class="btn btn-success" onclick="scanMyNetwork()">🔍 Scan MY Network</button>
+                        <button class="btn btn-success" onclick="scanIPRange()">🔍 Scan IP Range</button>
                         <button class="btn btn-primary" onclick="startDemoScan()">🎮 Demo</button>
                         <button class="btn btn-warning" onclick="simulateThreat()">⚡ Test Threat</button>
                     </div>
                 </div>
                 <div class="panel-body" style="padding:12px;">
+                    <!-- ===== IP INPUT SECTION ===== -->
+                    <div class="ip-input-section">
+                        <div class="ip-row">
+                            <label>IP Range:</label>
+                            <input type="text" id="ipRangeInput" placeholder="192.168.1.0/24" value="192.168.1.0/24">
+                            <button class="btn btn-success" onclick="scanIPRange()" style="font-size:10px;">🚀 Scan</button>
+                            <span class="scan-range-badge" id="rangeBadge">📡 192.168.1.0/24</span>
+                        </div>
+                        <div class="preset-ips">
+                            <span style="font-size:9px;color:var(--text-muted);margin-right:4px;">Quick:</span>
+                            <button class="preset-btn" onclick="setIPRange('192.168.1.0/24')">🏠 Home</button>
+                            <button class="preset-btn" onclick="setIPRange('10.0.0.0/24')">🏢 Office</button>
+                            <button class="preset-btn" onclick="setIPRange('172.16.0.0/24')">🌐 Corporate</button>
+                            <button class="preset-btn" onclick="setIPRange('192.168.0.0/24')">📡 Router</button>
+                            <button class="preset-btn" onclick="setIPRange('127.0.0.1/32')">💻 Localhost</button>
+                            <button class="preset-btn" onclick="setIPRange('')">🔄 Auto</button>
+                        </div>
+                    </div>
+
                     <div class="network-topology" id="networkTopology">
                         <canvas id="topologyCanvas"></canvas>
                         <div class="topology-legend">
+                            <span class="legend-item"><span class="legend-dot hub"></span> Hub</span>
                             <span class="legend-item"><span class="legend-dot safe"></span> Secure</span>
                             <span class="legend-item"><span class="legend-dot warning"></span> Warning</span>
                             <span class="legend-item"><span class="legend-dot danger"></span> Threat</span>
                             <span class="legend-item"><span class="legend-dot blocked"></span> Blocked</span>
-                            <span class="legend-item"><span class="legend-dot quantum"></span> Quantum Protected</span>
+                            <span class="legend-item"><span class="legend-dot quantum"></span> Protected</span>
                         </div>
                     </div>
                 </div>
@@ -621,9 +716,9 @@
             <div class="panel">
                 <div class="panel-header">
                     <div class="panel-title">
-                        📱 Your Devices
+                        📱 Devices Found
                         <span class="badge personal">👤 YOURS</span>
-                        <span class="badge" id="deviceCountBadge">0 online</span>
+                        <span class="badge" id="deviceCountBadge">0 found</span>
                         <span class="badge" id="threatCountBadge" style="display:none;"></span>
                     </div>
                     <div class="panel-actions">
@@ -634,8 +729,8 @@
                 <div class="panel-body">
                     <div class="device-list" id="deviceList">
                         <div class="text-center text-muted" style="padding:30px 0;">
-                            🔍 Click "Scan MY Network" to discover YOUR devices<br>
-                            <span style="font-size:10px;">Only YOU see YOUR network</span>
+                            🔍 Enter an IP range above and click Scan<br>
+                            <span style="font-size:10px;">Example: 192.168.1.0/24 scans your home network</span>
                         </div>
                     </div>
                 </div>
@@ -649,7 +744,7 @@
             <div class="panel">
                 <div class="panel-header">
                     <div class="panel-title">
-                        🧠 AI Analysis (Your Network)
+                        🧠 AI Analysis
                         <span class="badge quantum">🧠 Quantum</span>
                     </div>
                     <div class="panel-actions">
@@ -660,9 +755,9 @@
                 <div class="panel-body" style="padding:12px;">
                     <div class="ai-thoughts" id="aiThoughts">
                         <div class="thought">
-                            <span class="thought-timestamp">[INIT]</span> ⚡ Your Personal ECHOPLEX<br>
-                            <span class="thought-timestamp">[INIT]</span> 🔍 Click "Scan MY Network" to discover YOUR devices<br>
-                            <span class="thought-timestamp">[INIT]</span> 🔒 Your data stays on YOUR device
+                            <span class="thought-timestamp">[INIT]</span> ⚡ ECHOPLEX Personal Scanner Ready<br>
+                            <span class="thought-timestamp">[INIT]</span> 🔍 Enter an IP range to scan<br>
+                            <span class="thought-timestamp">[INIT]</span> 🌐 Examples: 192.168.1.0/24, 10.0.0.0/24
                         </div>
                     </div>
                 </div>
@@ -672,7 +767,7 @@
             <div class="panel">
                 <div class="panel-header">
                     <div class="panel-title">
-                        ⚙️ Your Settings
+                        ⚙️ Settings & Log
                         <span class="badge personal">👤 PERSONAL</span>
                         <span class="badge" id="logCountBadge">0 events</span>
                     </div>
@@ -683,38 +778,32 @@
                 </div>
                 <div class="panel-body">
                     <div class="config-section">
-                        <div style="font-size:11px;color:var(--text-muted);margin-bottom:10px;font-weight:600;">🔐 Your Configuration</div>
-                        
-                        <!-- ============================================================ -->
-                        <!-- 👤 EACH USER CONNECTS TO THEIR OWN QUANTUM API                 -->
-                        <!-- ============================================================ -->
-                        <div class="config-row">
-                            <label>Your Quantum API:</label>
-                            <input type="password" id="quantumApiKey" placeholder="Your IBM Quantum API key (optional)" value="">
-                            <button class="btn btn-quantum" onclick="connectQuantumAPI()" style="font-size:9px;">Connect</button>
-                            <span class="api-status inactive" id="quantumApiStatus">● Disconnected</span>
-                        </div>
-                        <!-- ============================================================ -->
-                        <!-- 👤 END OF PERSONAL API KEY SECTION                            -->
-                        <!-- ============================================================ -->
-                        
-                        <div class="config-row">
-                            <label>Your Backend:</label>
-                            <input type="text" id="backendUrl" value="https://echoplex-net-solutions.onrender.com">
-                            <button class="btn btn-primary" onclick="checkBackendStatus()" style="font-size:9px;">Check</button>
-                            <span class="api-status inactive" id="backendApiStatus">● Disconnected</span>
-                        </div>
+                        <div style="font-size:11px;color:var(--text-muted);margin-bottom:10px;font-weight:600;">🔐 Your Settings</div>
                         
                         <div class="config-row">
                             <label>Your Name:</label>
                             <input type="text" id="userName" placeholder="Enter your name" value="Guest">
                             <button class="btn btn-success" onclick="updateUserName()" style="font-size:9px;">Set</button>
                         </div>
+
+                        <div class="config-row">
+                            <label>Quantum API:</label>
+                            <input type="password" id="quantumApiKey" placeholder="Your IBM Quantum API key (optional)" value="">
+                            <button class="btn btn-quantum" onclick="connectQuantumAPI()" style="font-size:9px;">Connect</button>
+                            <span class="api-status inactive" id="quantumApiStatus">● Disconnected</span>
+                        </div>
+                        
+                        <div class="config-row">
+                            <label>Backend URL:</label>
+                            <input type="text" id="backendUrl" value="https://echoplex-net-solutions.onrender.com">
+                            <button class="btn btn-primary" onclick="checkBackendStatus()" style="font-size:9px;">Check</button>
+                            <span class="api-status inactive" id="backendApiStatus">● Disconnected</span>
+                        </div>
                         
                         <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;">
-                            <button class="btn btn-danger" onclick="clearMyData()" style="font-size:9px;">🗑 Clear My Data</button>
-                            <button class="btn btn-purple" onclick="exportMyReport()" style="font-size:9px;">📊 My Report</button>
-                            <button class="btn btn-quantum" onclick="applyQuantumProtection()" style="font-size:9px;">🛡️ Shield My Network</button>
+                            <button class="btn btn-danger" onclick="clearMyData()" style="font-size:9px;">🗑 Clear</button>
+                            <button class="btn btn-purple" onclick="exportMyReport()" style="font-size:9px;">📊 Report</button>
+                            <button class="btn btn-quantum" onclick="applyQuantumProtection()" style="font-size:9px;">🛡️ Shield</button>
                         </div>
                     </div>
                     
@@ -731,42 +820,26 @@
 
         <!-- ===== FOOTER ===== -->
         <div style="margin-top:14px;padding:10px 20px;background:rgba(17,24,39,0.9);border-radius:12px;border:1px solid rgba(255,255,255,0.05);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font-size:9px;color:var(--text-muted);">
-            <span>⚡ ECHOPLEX v5.0 · 👤 Personal Edition · You scan YOUR network · Your data stays yours</span>
+            <span>⚡ ECHOPLEX v5.0 · 👤 Personal Edition · Scan ANY IP Range · Your data stays yours</span>
             <span id="footerTimestamp">Last update: --</span>
         </div>
     </div>
 
     <script>
         // ============================================================
-        //  👤 PERSONAL EDITION - YOU SCAN YOUR NETWORK
+        //  👤 PERSONAL EDITION - SCAN ANY IP RANGE
         //  YOUR DATA STAYS ON YOUR DEVICE
         // ============================================================
         
         const CONFIG = {
-            // 👤 YOUR QUANTUM API KEY (Optional - you can add yours)
+            // 👤 YOUR QUANTUM API KEY (Optional)
             quantumApiKey: '',
-            
-            // 🌐 Backend server (shared - scans YOUR IP range)
+            // 🌐 Backend server
             backendUrl: 'https://echoplex-net-solutions.onrender.com',
-            
-            // 👤 Your user ID (generated per session)
+            // 👤 User ID
             userId: 'Guest_' + Math.random().toString(36).substr(2, 6),
-            
-            threatDatabase: [
-                { id: 'T001', name: 'Ransomware', severity: 'critical' },
-                { id: 'T002', name: 'Malware', severity: 'critical' },
-                { id: 'T003', name: 'DDoS Attack', severity: 'critical' },
-                { id: 'T004', name: 'Unauthorized Access', severity: 'high' },
-                { id: 'T005', name: 'Man-in-the-Middle', severity: 'critical' },
-                { id: 'T006', name: 'Credential Theft', severity: 'critical' },
-                { id: 'T007', name: 'Phishing', severity: 'high' },
-                { id: 'T008', name: 'Zero-Day Exploit', severity: 'critical' }
-            ],
-            
-            deviceTypes: [
-                '💻 Workstation', '📱 Mobile', '🖥 Server', '📟 Database',
-                '📡 Router', '🔄 Switch', '🛡 Firewall', '📷 Camera'
-            ]
+            // Default IP range
+            defaultIPRange: '192.168.1.0/24'
         };
 
         // ============================================================
@@ -788,9 +861,10 @@
             quantumConnected: false,
             quantumApiKey: CONFIG.quantumApiKey,
             realDeviceCount: 0,
-            quantumProtectedDevices: [],
             userName: 'Guest',
-            sessionId: CONFIG.userId
+            sessionId: CONFIG.userId,
+            currentIPRange: CONFIG.defaultIPRange,
+            scanCount: 0
         };
 
         // ============================================================
@@ -810,6 +884,8 @@
         const networkHealth = $('networkHealth');
         const quantumStatusValue = $('quantumStatusValue');
         const quantumStatusText = $('quantumStatusText');
+        const scanStatusValue = $('scanStatusValue');
+        const scanStatusText = $('scanStatusText');
         const deviceCountBadge = $('deviceCountBadge');
         const threatCountBadge = $('threatCountBadge');
         const logCountBadge = $('logCountBadge');
@@ -821,7 +897,7 @@
         const backendStatus = $('backendStatus');
         const backendApiStatus = $('backendApiStatus');
         const quantumApiStatus = $('quantumApiStatus');
-        const quantumStatusBadge = $('quantumStatusBadge');
+        const rangeBadge = $('rangeBadge');
         const userIdDisplay = $('userIdDisplay');
         const flashOverlay = $('flashOverlay');
         const toast = $('toast');
@@ -832,6 +908,7 @@
         const backendUrlInput = $('backendUrl');
         const quantumApiKeyInput = $('quantumApiKey');
         const userNameInput = $('userName');
+        const ipRangeInput = $('ipRangeInput');
 
         // ============================================================
         //  USER FUNCTIONS
@@ -840,23 +917,43 @@
             const name = userNameInput.value.trim() || 'Guest';
             state.userName = name;
             userIdDisplay.textContent = name;
-            addAIThought(`👤 Welcome ${name}! This is YOUR network`);
+            addAIThought(`👤 Welcome ${name}!`);
             showToast('👤 Name Updated', `Hello ${name}!`);
         }
 
         // ============================================================
-        //  QUANTUM API (OPTIONAL - EACH USER CONNECTS THEIR OWN)
+        //  IP RANGE FUNCTIONS
+        // ============================================================
+        function setIPRange(range) {
+            ipRangeInput.value = range;
+            rangeBadge.textContent = `📡 ${range || 'Auto'}`;
+            if (range) {
+                state.currentIPRange = range;
+                addAIThought(`📡 IP range set to: ${range}`);
+            } else {
+                state.currentIPRange = '';
+                addAIThought('📡 IP range set to: Auto-detect');
+            }
+        }
+
+        function updateIPRange() {
+            const range = ipRangeInput.value.trim() || CONFIG.defaultIPRange;
+            state.currentIPRange = range;
+            rangeBadge.textContent = `📡 ${range}`;
+            addAIThought(`📡 IP range updated to: ${range}`);
+        }
+
+        // ============================================================
+        //  QUANTUM API (OPTIONAL)
         // ============================================================
         function connectQuantumAPI() {
             const key = quantumApiKeyInput.value.trim();
             if (!key) {
-                showToast('ℹ️ Optional', 'Quantum API is optional. Enter your key if you have one.');
+                showToast('ℹ️ Optional', 'Quantum API is optional.');
                 return;
             }
             
             state.quantumApiKey = key;
-            CONFIG.quantumApiKey = key;
-            
             addAIThought('🔐 Connecting to YOUR IBM Quantum API...');
             
             if (key.length < 10) {
@@ -872,40 +969,41 @@
                 state.quantumConnected = true;
                 quantumApiStatus.className = 'api-status quantum';
                 quantumApiStatus.textContent = '● Connected';
-                quantumStatusBadge.className = 'api-status quantum';
-                quantumStatusBadge.textContent = '● Quantum Online';
                 quantumStatusValue.textContent = '✅';
-                quantumStatusText.textContent = 'Your Quantum Ready';
-                
+                quantumStatusText.textContent = 'Quantum Ready';
                 showToast('✅ Quantum Connected', 'Your IBM Quantum API is active');
-                addAIThought('✅ Your IBM Quantum API connected successfully');
-                addLogEntry('🧠 Your Quantum API connected', 'quantum');
+                addAIThought('✅ Your Quantum API connected successfully');
+                addLogEntry('🧠 Quantum API connected', 'quantum');
                 updateStats();
-                
-                setTimeout(() => {
-                    testQuantumConnection();
-                }, 1000);
             }, 1500);
         }
 
-        function testQuantumConnection() {
+        function applyQuantumProtection() {
             if (!state.quantumConnected) {
-                showToast('ℹ️ Optional', 'Quantum API not connected');
+                showToast('ℹ️ Optional', 'Connect Quantum API for protection');
                 return;
             }
             
-            addAIThought('🔬 Testing YOUR quantum circuit...');
-            
-            setTimeout(() => {
-                const result = 95 + Math.random() * 5;
-                addAIThought(`📊 Your quantum test: ${result.toFixed(2)}% coherence`);
-                addAIThought('✅ Your quantum system operational');
-                showToast('✅ Quantum Test Passed', 'Your quantum resources are working');
-            }, 2000);
+            addAIThought(`🛡️ Applying Quantum Protection...`);
+            state.devices.forEach(device => {
+                if (device.status !== 'blocked') {
+                    device.quantumProtected = true;
+                    if (device.status === 'danger' && Math.random() < 0.7) {
+                        device.status = 'safe';
+                        device.threat = null;
+                        addLogEntry(`🧠 Quantum AI healed ${device.name}`, 'quantum');
+                    }
+                }
+            });
+            addAIThought('✅ Quantum Protection applied');
+            showToast('🛡️ Quantum Shield Active', 'Devices are quantum protected');
+            updateDeviceList();
+            updateStats();
+            drawTopology();
         }
 
         // ============================================================
-        //  BACKEND FUNCTIONS (Shared - Scans YOUR IP)
+        //  BACKEND FUNCTIONS
         // ============================================================
         async function checkBackendStatus() {
             const url = backendUrlInput.value.trim() || CONFIG.backendUrl;
@@ -926,8 +1024,8 @@
                     backendStatus.textContent = '● Backend Online';
                     backendApiStatus.className = 'api-status active';
                     backendApiStatus.textContent = '● Connected';
-                    addAIThought(`✅ Backend online: ${data.version || 'ECHOPLEX v5.0'}`);
-                    showToast('✅ Backend Connected', 'Ready to scan YOUR network');
+                    addAIThought(`✅ Backend online`);
+                    showToast('✅ Backend Connected', 'Ready to scan');
                 } else {
                     state.backendOnline = false;
                     backendStatus.className = 'backend-status offline';
@@ -947,13 +1045,31 @@
         }
 
         // ============================================================
-        //  SCAN YOUR NETWORK - ONLY YOUR DEVICES
+        //  SCAN IP RANGE - USER ENTERS ANY IP RANGE
         // ============================================================
-        async function scanMyNetwork() {
+        async function scanIPRange() {
             if (state.isScanning) {
                 showToast('⏳ Scan Running', 'Please wait');
                 return;
             }
+
+            // Get IP range from input
+            let range = ipRangeInput.value.trim();
+            if (!range) {
+                range = CONFIG.defaultIPRange;
+                ipRangeInput.value = range;
+            }
+            
+            // Validate IP range format
+            const ipPattern = /^(\d{1,3}\.){3}\d{1,3}(\/\d{1,2})?$/;
+            if (!ipPattern.test(range) && range !== '') {
+                showToast('❌ Invalid IP', 'Please enter valid IP range (e.g., 192.168.1.0/24)');
+                return;
+            }
+
+            state.currentIPRange = range;
+            rangeBadge.textContent = `📡 ${range}`;
+            state.scanCount++;
 
             if (!state.backendOnline) {
                 await checkBackendStatus();
@@ -964,14 +1080,19 @@
             }
 
             state.isScanning = true;
-            scanStatusBadge.textContent = '🔵 Scanning YOUR Network...';
+            scanStatusBadge.textContent = '🔵 Scanning...';
             scanStatusBadge.style.color = 'var(--primary)';
+            scanStatusValue.textContent = '🔄';
+            scanStatusText.textContent = 'Scanning...';
             
-            addAIThought(`🌐 ${state.userName} is scanning THEIR network...`);
-            addLogEntry(`🌐 ${state.userName} initiated a network scan`, 'info');
+            addAIThought(`🌐 Scanning IP range: ${range}`);
+            addAIThought(`👤 ${state.userName} is scanning their network`);
+            addLogEntry(`🌐 Scanning: ${range}`, 'info');
 
             try {
-                const response = await fetch(`${CONFIG.backendUrl}/api/scan-network`, {
+                // If backend supports custom range
+                const url = `${CONFIG.backendUrl}/api/scan-network?range=${encodeURIComponent(range)}`;
+                const response = await fetch(url, {
                     method: 'GET',
                     headers: { 'Content-Type': 'application/json' }
                 });
@@ -984,19 +1105,22 @@
                 const devices = data.devices || data;
                 
                 if (!devices || devices.length === 0) {
-                    addAIThought('⚠️ No devices found on YOUR network');
-                    showToast('⚠️ No Devices', 'No active devices found on YOUR network');
+                    addAIThought(`⚠️ No devices found in ${range}`);
+                    showToast('⚠️ No Devices', `No active devices found in ${range}`);
                     state.isScanning = false;
-                    scanStatusBadge.textContent = '🟢 Active';
+                    scanStatusBadge.textContent = '🟢 Ready';
                     scanStatusBadge.style.color = 'var(--primary)';
+                    scanStatusValue.textContent = '⏳';
+                    scanStatusText.textContent = 'No devices';
                     return;
                 }
 
-                let realCount = 0;
+                // Clear previous devices? Only if user wants to replace
+                // Let's keep them and add new ones
+                let foundCount = 0;
                 devices.forEach(device => {
                     const exists = state.devices.some(d => d.ip === device.ip);
                     if (!exists) {
-                        const isMyDevice = detectMyDevice(device.ip);
                         state.devices.push({
                             id: ++state.deviceIdCounter,
                             name: device.hostname || device.ip,
@@ -1007,19 +1131,19 @@
                             status: 'safe',
                             threat: null,
                             isReal: true,
-                            isMyDevice: isMyDevice,
+                            isMyDevice: false,
                             quantumProtected: state.quantumConnected,
                             lastSeen: new Date().toISOString(),
                             traffic: Math.floor(Math.random() * 100) + 10
                         });
-                        realCount++;
+                        foundCount++;
                     }
                 });
 
-                state.realDeviceCount = realCount;
-                addAIThought(`✅ Found ${realCount} devices on YOUR network!`);
-                addLogEntry(`✅ ${state.userName} found ${realCount} devices on their network`, 'success');
-                showToast(`✅ ${realCount} Devices Found`, `On YOUR network!`);
+                state.realDeviceCount = foundCount;
+                addAIThought(`✅ Found ${foundCount} devices in ${range}!`);
+                addLogEntry(`✅ Found ${foundCount} devices in ${range}`, 'success');
+                showToast(`✅ ${foundCount} Devices Found`, `In ${range}`);
 
                 if (state.quantumConnected) {
                     applyQuantumProtection();
@@ -1032,40 +1156,34 @@
                 setTimeout(() => flashOverlay.className = 'flash-overlay', 500);
 
             } catch (error) {
-                addAIThought(`❌ Error scanning YOUR network: ${error.message}`);
+                addAIThought(`❌ Error: ${error.message}`);
                 showToast('❌ Scan Failed', error.message);
-                addLogEntry(`❌ ${state.userName} scan error: ${error.message}`, 'critical');
+                addLogEntry(`❌ Scan error: ${error.message}`, 'critical');
             }
 
             state.isScanning = false;
-            scanStatusBadge.textContent = '🟢 Active';
+            scanStatusBadge.textContent = '🟢 Ready';
             scanStatusBadge.style.color = 'var(--primary)';
-        }
-
-        function detectMyDevice(ip) {
-            // Detect if this is likely the user's own device
-            // This is a heuristic - in production would use more sophisticated detection
-            const localIPs = ['127.0.0.1', '::1'];
-            if (localIPs.includes(ip)) return true;
-            
-            // Check if it's the most common local IP (user's machine)
-            // In a real implementation, this would use more accurate detection
-            return false;
+            scanStatusValue.textContent = '✅';
+            scanStatusText.textContent = 'Complete';
         }
 
         // ============================================================
-        //  DEMO SCAN (Simulated - For demonstration)
+        //  DEMO SCAN (Simulated)
         // ============================================================
         function startDemoScan() {
             if (state.isScanning) return;
             state.isScanning = true;
-            scanStatusBadge.textContent = '🔵 Demo Scan...';
+            scanStatusBadge.textContent = '🔵 Demo...';
+            scanStatusValue.textContent = '🔄';
+            scanStatusText.textContent = 'Demo';
             
-            addAIThought(`🔍 ${state.userName} is running a demo scan...`);
+            addAIThought(`🔍 Running demo scan...`);
             const count = 2 + Math.floor(Math.random() * 4);
+            const range = ipRangeInput.value.trim() || '192.168.1.0/24';
             
             for (let i = 0; i < count; i++) {
-                const device = generateDemoDevice();
+                const device = generateDemoDevice(range);
                 if (Math.random() < 0.08) {
                     const threat = CONFIG.threatDatabase[Math.floor(Math.random() * CONFIG.threatDatabase.length)];
                     device.status = 'danger';
@@ -1085,18 +1203,30 @@
             drawTopology();
             
             state.isScanning = false;
-            scanStatusBadge.textContent = '🟢 Active';
+            scanStatusBadge.textContent = '🟢 Ready';
+            scanStatusValue.textContent = '✅';
+            scanStatusText.textContent = 'Demo Complete';
             showToast('✅ Demo Complete', `${count} devices added`);
         }
 
-        function generateDemoDevice() {
+        function generateDemoDevice(range) {
             const types = CONFIG.deviceTypes;
             const type = types[Math.floor(Math.random() * types.length)];
-            const ip = `192.168.1.${10 + Math.floor(Math.random() * 200)}`;
+            
+            // Parse range to generate IP
+            let baseIP = '192.168.1';
+            if (range && range.includes('/')) {
+                const parts = range.split('/')[0].split('.');
+                if (parts.length === 4) {
+                    baseIP = parts.slice(0, 3).join('.');
+                }
+            }
+            const ip = `${baseIP}.${10 + Math.floor(Math.random() * 200)}`;
+            
             const mac = Array.from({length:6}, () => 
                 Math.floor(Math.random() * 256).toString(16).padStart(2,'0').toUpperCase()
             ).join(':');
-            const hostnames = ['DESKTOP', 'LAPTOP', 'SERVER', 'WORKSTATION'];
+            const hostnames = ['DESKTOP', 'LAPTOP', 'SERVER', 'WORKSTATION', 'PHONE', 'TABLET'];
             const hostname = hostnames[Math.floor(Math.random() * hostnames.length)];
             
             return {
@@ -1105,7 +1235,7 @@
                 type: type,
                 ip: ip,
                 mac: mac,
-                os: ['Windows 11', 'macOS', 'Ubuntu'][Math.floor(Math.random() * 3)],
+                os: ['Windows 11', 'macOS', 'Ubuntu', 'Android', 'iOS'][Math.floor(Math.random() * 5)],
                 status: 'safe',
                 threat: null,
                 isReal: false,
@@ -1117,38 +1247,7 @@
         }
 
         // ============================================================
-        //  QUANTUM PROTECTION (For YOUR devices)
-        // ============================================================
-        function applyQuantumProtection() {
-            if (!state.quantumConnected) {
-                showToast('ℹ️ Optional', 'Connect Quantum API for protection');
-                return;
-            }
-            
-            addAIThought(`🛡️ ${state.userName} is applying Quantum Protection to their devices...`);
-            
-            state.devices.forEach(device => {
-                if (device.status !== 'blocked') {
-                    device.quantumProtected = true;
-                    if (device.status === 'danger' && Math.random() < 0.7) {
-                        device.status = 'safe';
-                        device.threat = null;
-                        addLogEntry(`🧠 Quantum AI healed ${device.name} on YOUR network`, 'quantum');
-                    }
-                }
-            });
-            
-            addAIThought('✅ Quantum Protection applied to YOUR devices');
-            showToast('🛡️ Quantum Shield Active', 'Your devices are quantum protected');
-            flashOverlay.className = 'flash-overlay quantum';
-            setTimeout(() => flashOverlay.className = 'flash-overlay', 500);
-            updateDeviceList();
-            updateStats();
-            drawTopology();
-        }
-
-        // ============================================================
-        //  QUANTUM ANALYSIS (For YOUR network)
+        //  QUANTUM ANALYSIS
         // ============================================================
         function runQuantumAnalysis() {
             if (!state.quantumConnected) {
@@ -1157,17 +1256,17 @@
                 return;
             }
             
-            addAIThought(`🧠 ${state.userName} is running Quantum Analysis on THEIR network...`);
-            addLogEntry(`🧠 ${state.userName} started quantum analysis`, 'quantum');
+            addAIThought(`🧠 Running Quantum Analysis...`);
+            addLogEntry(`🧠 Quantum analysis started`, 'quantum');
 
             const analysisSteps = [
-                'Analyzing YOUR network patterns',
-                'Processing threats on YOUR devices',
-                'Evaluating YOUR risk scores',
-                'Predicting attacks on YOUR network',
-                'Verifying YOUR security policies',
-                'Detecting YOUR network anomalies',
-                'Generating YOUR security recommendations'
+                'Analyzing network patterns',
+                'Processing threats',
+                'Evaluating risk scores',
+                'Predicting attacks',
+                'Verifying security policies',
+                'Detecting anomalies',
+                'Generating recommendations'
             ];
 
             let step = 0;
@@ -1179,19 +1278,19 @@
                     const warnings = state.devices.filter(d => d.status === 'warning').length;
                     const secure = state.devices.filter(d => d.status === 'safe').length;
                     
-                    addAIThought(`📊 Your Quantum Analysis Complete!`);
-                    addAIThought(`📈 Your network: ${secure} secure, ${warnings} warnings, ${threats} threats`);
-                    addAIThought(`🎯 Your Quantum AI Confidence: ${state.aiConfidence}%`);
+                    addAIThought(`📊 Quantum Analysis Complete!`);
+                    addAIThought(`📈 ${secure} secure, ${warnings} warnings, ${threats} threats`);
+                    addAIThought(`🎯 AI Confidence: ${state.aiConfidence}%`);
                     
                     if (threats > 0) {
-                        addAIThought(`⚡ Quantum auto-heal initiated for ${threats} threats`);
+                        addAIThought(`⚡ Quantum auto-heal initiated`);
                         const criticalThreats = state.devices.filter(d => d.status === 'danger');
                         criticalThreats.forEach(d => {
                             if (Math.random() < 0.6) {
                                 d.status = 'safe';
                                 d.threat = null;
                                 d.quantumProtected = true;
-                                addLogEntry(`🧠 Quantum AI healed ${d.name} on YOUR network`, 'quantum');
+                                addLogEntry(`🧠 Quantum AI healed ${d.name}`, 'quantum');
                             }
                         });
                         updateDeviceList();
@@ -1199,7 +1298,7 @@
                         drawTopology();
                     }
                     
-                    showToast('🧠 Your Quantum Analysis Complete', `Analyzed YOUR ${state.devices.length} devices`);
+                    showToast('🧠 Analysis Complete', `Analyzed ${state.devices.length} devices`);
                     return;
                 }
 
@@ -1211,14 +1310,14 @@
         }
 
         // ============================================================
-        //  DEVICE MANAGEMENT (YOUR devices)
+        //  DEVICE MANAGEMENT
         // ============================================================
         function blockDevice(id) {
             const device = state.devices.find(d => d.id === id);
             if (device && device.status !== 'blocked') {
                 device.status = 'blocked';
-                addLogEntry(`🚫 ${state.userName} blocked ${device.name}`, 'critical');
-                addAIThought(`🚫 ${state.userName} blocked ${device.name}`);
+                addLogEntry(`🚫 Blocked ${device.name} (${device.ip})`, 'critical');
+                addAIThought(`🚫 Blocked ${device.name}`);
                 updateDeviceList();
                 updateStats();
                 drawTopology();
@@ -1234,8 +1333,8 @@
                 if (state.quantumConnected) {
                     device.quantumProtected = true;
                 }
-                addLogEntry(`✅ ${state.userName} unblocked ${device.name}`, 'success');
-                addAIThought(`✅ ${state.userName} restored ${device.name}`);
+                addLogEntry(`✅ Unblocked ${device.name}`, 'success');
+                addAIThought(`✅ ${device.name} restored`);
                 updateDeviceList();
                 updateStats();
                 drawTopology();
@@ -1251,8 +1350,8 @@
                 if (state.quantumConnected) {
                     device.quantumProtected = true;
                 }
-                addLogEntry(`✅ ${state.userName} resolved threat on ${device.name}`, 'success');
-                addAIThought(`✅ ${state.userName} resolved threat on ${device.name}`);
+                addLogEntry(`✅ Resolved threat on ${device.name}`, 'success');
+                addAIThought(`✅ Threat resolved on ${device.name}`);
                 updateDeviceList();
                 updateStats();
                 drawTopology();
@@ -1263,12 +1362,12 @@
         function blockAllThreats() {
             const threats = state.devices.filter(d => d.status === 'danger' || d.status === 'warning');
             if (threats.length === 0) {
-                showToast('✅ No Threats', 'All YOUR devices are secure');
+                showToast('✅ No Threats', 'All devices are secure');
                 return;
             }
             threats.forEach(d => { d.status = 'blocked'; });
-            addLogEntry(`🚫 ${state.userName} blocked ${threats.length} threat devices`, 'critical');
-            addAIThought(`🚫 ${state.userName} blocked ${threats.length} devices`);
+            addLogEntry(`🚫 Blocked ${threats.length} threat devices`, 'critical');
+            addAIThought(`🚫 Blocked ${threats.length} devices`);
             updateDeviceList();
             updateStats();
             drawTopology();
@@ -1283,14 +1382,14 @@
             state.isLockdown = true;
             state.devices.forEach(d => { if (d.status !== 'blocked') d.status = 'blocked'; });
             systemStatusDot.className = 'status-dot red';
-            systemStatusText.textContent = '🔒 YOUR LOCKDOWN';
+            systemStatusText.textContent = '🔒 LOCKDOWN';
             systemStatusText.style.color = 'var(--danger)';
-            addLogEntry(`🔒 ${state.userName} initiated EMERGENCY LOCKDOWN`, 'critical');
-            addAIThought(`🔒 ${state.userName} EMERGENCY LOCKDOWN ACTIVATED`);
+            addLogEntry('🔒 EMERGENCY LOCKDOWN', 'critical');
+            addAIThought('🔒 LOCKDOWN ACTIVATED');
             updateDeviceList();
             updateStats();
             drawTopology();
-            showToast('🔒 YOUR LOCKDOWN', 'All YOUR devices isolated');
+            showToast('🔒 LOCKDOWN', 'All devices isolated');
             flashOverlay.className = 'flash-overlay danger';
             setTimeout(() => flashOverlay.className = 'flash-overlay', 1000);
             
@@ -1307,19 +1406,19 @@
                 systemStatusDot.className = 'status-dot green';
                 systemStatusText.textContent = 'All Systems Secure';
                 systemStatusText.style.color = 'var(--text)';
-                addLogEntry(`✅ ${state.userName} lockdown lifted`, 'success');
-                addAIThought(`✅ ${state.userName} lockdown lifted`);
+                addLogEntry('✅ Lockdown lifted', 'success');
+                addAIThought('✅ Lockdown lifted');
                 updateDeviceList();
                 updateStats();
                 drawTopology();
-                showToast('✅ Lockdown Lifted', 'YOUR network restored');
+                showToast('✅ Lockdown Lifted', 'Network restored');
             }, 30000);
         }
 
         function simulateThreat() {
             const safe = state.devices.filter(d => d.status === 'safe');
             if (safe.length === 0) {
-                showToast('⚠️ No Targets', 'All YOUR devices have threats');
+                showToast('⚠️ No Targets', 'All devices have threats');
                 return;
             }
             const device = safe[Math.floor(Math.random() * safe.length)];
@@ -1327,8 +1426,8 @@
             device.status = 'danger';
             device.threat = threat.name;
             state.totalDetected++;
-            addLogEntry(`⚠️ ${threat.name} on ${device.name} (YOUR network)`, 'critical');
-            addAIThought(`🔥 ${threat.name} detected on YOUR device ${device.name}`);
+            addLogEntry(`⚠️ ${threat.name} on ${device.name}`, 'critical');
+            addAIThought(`🔥 ${threat.name} detected on ${device.name}`);
             flashOverlay.className = 'flash-overlay danger';
             setTimeout(() => flashOverlay.className = 'flash-overlay', 400);
             
@@ -1338,12 +1437,12 @@
                         device.status = 'safe';
                         device.threat = null;
                         device.quantumProtected = true;
-                        addLogEntry(`🧠 Quantum AI healed YOUR device ${device.name}`, 'quantum');
-                        addAIThought(`✅ Quantum AI neutralized threat on YOUR ${device.name}`);
+                        addLogEntry(`🧠 Quantum AI healed ${device.name}`, 'quantum');
+                        addAIThought(`✅ Quantum AI neutralized threat on ${device.name}`);
                         updateDeviceList();
                         updateStats();
                         drawTopology();
-                        showToast('🧠 Quantum Healed', `Threat on YOUR ${device.name} neutralized`);
+                        showToast('🧠 Quantum Healed', `Threat on ${device.name} neutralized`);
                     }
                 }, 2000);
             }
@@ -1351,11 +1450,11 @@
             updateDeviceList();
             updateStats();
             drawTopology();
-            showToast('🔴 Threat Detected', `${threat.name} on YOUR ${device.name}`);
+            showToast('🔴 Threat Detected', `${threat.name} on ${device.name}`);
         }
 
         // ============================================================
-        //  UI UPDATE FUNCTIONS (YOUR data)
+        //  UI UPDATE FUNCTIONS
         // ============================================================
         function updateDeviceList() {
             const active = state.devices.filter(d => d.status !== 'blocked');
@@ -1374,7 +1473,7 @@
                 deviceList.innerHTML = `
                     <div class="text-center text-muted" style="padding:30px 0;">
                         🔍 No devices found<br>
-                        <span style="font-size:10px;">Click "Scan MY Network" to discover YOUR devices</span>
+                        <span style="font-size:10px;">Enter an IP range and click "Scan"</span>
                     </div>
                 `;
                 return;
@@ -1445,8 +1544,8 @@
             const device = state.devices.find(d => d.id === id);
             if (device) {
                 device.quantumProtected = true;
-                addLogEntry(`🧠 Quantum Shield applied to YOUR ${device.name}`, 'quantum');
-                addAIThought(`🛡️ Quantum protection added to YOUR ${device.name}`);
+                addLogEntry(`🧠 Quantum Shield applied to ${device.name}`, 'quantum');
+                addAIThought(`🛡️ Quantum protection added to ${device.name}`);
                 updateDeviceList();
                 drawTopology();
                 showToast('🧠 Quantum Shield', `${device.name} is now quantum protected`);
@@ -1459,7 +1558,6 @@
             const real = state.devices.filter(d => d.isReal).length;
             const blocked = state.devices.filter(d => d.status === 'blocked').length;
             const quantumProtected = state.devices.filter(d => d.quantumProtected).length;
-            const myDevices = state.devices.filter(d => d.isMyDevice).length;
 
             totalDevices.textContent = total;
             realDevices.textContent = real;
@@ -1473,24 +1571,24 @@
 
             if (threats > 0) {
                 systemStatusDot.className = 'status-dot red';
-                systemStatusText.textContent = `⚠️ ${threats} Threats on YOUR network`;
+                systemStatusText.textContent = `⚠️ ${threats} Threats`;
                 systemStatusText.style.color = 'var(--danger)';
-                aiStatus.textContent = state.quantumConnected ? '🔴 Quantum Responding' : '🔴 Responding';
+                aiStatus.textContent = state.quantumConnected ? '🔴 Quantum' : '🔴 Responding';
             } else if (quantumProtected > 0) {
                 systemStatusDot.className = 'status-dot green';
                 systemStatusText.textContent = `🛡️ ${quantumProtected} Quantum Protected`;
                 systemStatusText.style.color = 'var(--secondary)';
-                aiStatus.textContent = state.quantumConnected ? '🟣 Quantum Active' : '🟢 Secure';
+                aiStatus.textContent = state.quantumConnected ? '🟣 Quantum' : '🟢 Secure';
             } else {
                 systemStatusDot.className = 'status-dot green';
-                systemStatusText.textContent = 'YOUR Network Secure';
+                systemStatusText.textContent = 'Ready';
                 systemStatusText.style.color = 'var(--text)';
-                aiStatus.textContent = state.quantumConnected ? '🟣 Quantum Secure' : '🟢 Secure';
+                aiStatus.textContent = state.quantumConnected ? '🟣 Quantum' : '🟢 Secure';
             }
 
             if (state.quantumConnected) {
                 quantumStatusValue.textContent = '✅';
-                quantumStatusText.textContent = 'Your Quantum Ready';
+                quantumStatusText.textContent = 'Quantum Ready';
                 quantumStatusValue.style.color = 'var(--secondary)';
             } else {
                 quantumStatusValue.textContent = '⏳';
@@ -1550,13 +1648,13 @@
         function clearLog() {
             state.log = [];
             renderLog();
-            showToast('🗑 Log Cleared', 'Your log cleared');
+            showToast('🗑 Log Cleared', 'Log cleared');
         }
 
         function exportLog() {
             const text = state.log.map(e => `[${e.time}] ${e.msg}`).join('\n');
             downloadFile(text, `ECHOPLEX_${state.userName}_Log_${new Date().toISOString().slice(0,10)}.txt`);
-            showToast('📤 Log Exported', 'Your log downloaded');
+            showToast('📤 Log Exported', 'Log downloaded');
         }
 
         function exportMyReport() {
@@ -1564,32 +1662,32 @@
                 user: state.userName,
                 session: state.sessionId,
                 timestamp: new Date().toISOString(),
+                ipRange: state.currentIPRange,
                 devices: state.devices,
                 totalDetected: state.totalDetected,
                 networkHealth: state.networkHealth,
                 aiConfidence: state.aiConfidence,
                 quantumConnected: state.quantumConnected,
-                deviceCount: state.devices.length
+                scanCount: state.scanCount
             };
             downloadFile(JSON.stringify(report, null, 2), `ECHOPLEX_${state.userName}_Report_${new Date().toISOString().slice(0,10)}.json`);
-            showToast('📊 Your Report', 'Your complete report exported');
+            showToast('📊 Report Exported', 'Complete report downloaded');
         }
 
         function clearMyData() {
-            if (confirm(`⚠️ ${state.userName}, clear YOUR data? This will remove all YOUR devices and logs.`)) {
+            if (confirm(`⚠️ Clear all data?`)) {
                 state.devices = [];
                 state.log = [];
                 state.aiThoughts = [];
                 state.totalDetected = 0;
                 state.deviceIdCounter = 0;
                 state.realDeviceCount = 0;
-                state.quantumProtectedDevices = [];
                 updateDeviceList();
                 updateStats();
                 drawTopology();
                 renderLog();
-                addAIThought(`🔄 ${state.userName} cleared their data`);
-                showToast('🗑 Your Data Cleared', 'Your devices and logs have been cleared');
+                addAIThought(`🔄 Data cleared`);
+                showToast('🗑 Data Cleared', 'Your data has been cleared');
             }
         }
 
@@ -1628,7 +1726,7 @@
         function resizeTopology() {
             const rect = topologyCanvas.parentElement.getBoundingClientRect();
             topologyCanvas.width = rect.width - 4;
-            topologyCanvas.height = 350;
+            topologyCanvas.height = 380;
         }
 
         function drawTopology() {
@@ -1647,6 +1745,7 @@
             const cx = w / 2, cy = h / 2;
             const radius = Math.min(w, h) * 0.3;
 
+            // Hub glow
             if (state.quantumConnected) {
                 const quantumGlow = ctx.createRadialGradient(cx, cy, 5, cx, cy, 60);
                 quantumGlow.addColorStop(0, 'rgba(124, 58, 237, 0.2)');
@@ -1657,33 +1756,40 @@
                 ctx.fill();
             }
 
-            ctx.fillStyle = 'rgba(0, 212, 255, 0.1)';
-            ctx.shadowColor = 'rgba(0, 212, 255, 0.2)';
-            ctx.shadowBlur = 30;
+            // Hub
+            ctx.fillStyle = 'rgba(0, 212, 255, 0.15)';
+            ctx.shadowColor = 'rgba(0, 212, 255, 0.3)';
+            ctx.shadowBlur = 40;
             ctx.beginPath();
-            ctx.arc(cx, cy, 30, 0, Math.PI * 2);
+            ctx.arc(cx, cy, 35, 0, Math.PI * 2);
             ctx.fill();
             ctx.shadowBlur = 0;
 
+            // Hub ring
+            ctx.strokeStyle = state.quantumConnected ? 'rgba(124, 58, 237, 0.4)' : 'rgba(0, 212, 255, 0.3)';
+            ctx.lineWidth = 2;
+            ctx.shadowColor = state.quantumConnected ? 'rgba(124, 58, 237, 0.3)' : 'rgba(0, 212, 255, 0.2)';
+            ctx.shadowBlur = 20;
+            ctx.beginPath();
+            ctx.arc(cx, cy, 25, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+
+            // Hub text
             ctx.fillStyle = state.quantumConnected ? 'var(--secondary)' : '#00d4ff';
             ctx.font = 'bold 10px Orbitron, monospace';
             ctx.textAlign = 'center';
-            ctx.fillText(state.quantumConnected ? `⚡ ${state.userName}'s QUANTUM` : `⚡ ${state.userName}'s NETWORK`, cx, cy + 4);
+            const rangeLabel = state.currentIPRange || 'Auto';
+            ctx.fillText(`🌐 ${rangeLabel}`, cx, cy + 4);
             
-            if (state.quantumConnected) {
-                ctx.fillStyle = 'rgba(124, 58, 237, 0.5)';
-                ctx.font = '7px monospace';
-                ctx.fillText('🧠 YOUR QUANTUM SECURE', cx, cy + 18);
-            } else {
-                ctx.fillStyle = 'rgba(0, 212, 255, 0.3)';
-                ctx.font = '7px monospace';
-                ctx.fillText('👤 YOUR PERSONAL NETWORK', cx, cy + 18);
-            }
+            ctx.fillStyle = 'rgba(255,255,255,0.2)';
+            ctx.font = '7px monospace';
+            ctx.fillText(`${state.devices.length} devices`, cx, cy + 20);
 
             if (state.devices.length === 0) {
                 ctx.fillStyle = 'rgba(255,255,255,0.05)';
                 ctx.font = '12px Segoe UI, sans-serif';
-                ctx.fillText(`🔍 ${state.userName}, click "Scan MY Network"`, cx, cy + 50);
+                ctx.fillText('🔍 Enter IP range and click Scan', cx, cy + 55);
                 requestAnimationFrame(drawTopology);
                 return;
             }
@@ -1765,6 +1871,7 @@
                     ctx.setLineDash([]);
                 }
 
+                // Real tag ring
                 if (device.isReal) {
                     ctx.strokeStyle = 'rgba(0,212,255,0.3)';
                     ctx.lineWidth = 1;
@@ -1806,19 +1913,21 @@
                 }
             });
 
+            // Scanning ring animation
             const scanAngle = (Date.now() / 4000) % (Math.PI * 2);
             ctx.strokeStyle = state.quantumConnected ? 'rgba(124, 58, 237, 0.2)' : 'rgba(0, 212, 255, 0.1)';
             ctx.lineWidth = 1;
             ctx.setLineDash([4, 8]);
             ctx.beginPath();
-            ctx.arc(cx, cy, radius + 12, scanAngle - 0.3, scanAngle + 0.3);
+            ctx.arc(cx, cy, radius + 15, scanAngle - 0.3, scanAngle + 0.3);
             ctx.stroke();
             ctx.setLineDash([]);
 
+            // Device count
             ctx.fillStyle = 'rgba(255,255,255,0.03)';
             ctx.font = '8px Segoe UI, sans-serif';
             ctx.textAlign = 'right';
-            ctx.fillText(`${state.devices.length} devices`, w - 10, h - 10);
+            ctx.fillText(`${state.devices.length} devices in ${state.currentIPRange || 'range'}`, w - 10, h - 10);
 
             requestAnimationFrame(drawTopology);
         }
@@ -1833,10 +1942,15 @@
             userIdDisplay.textContent = state.userName;
             userNameInput.value = state.userName;
             
-            // Set backend URL from config
+            // Set default IP range
+            ipRangeInput.value = CONFIG.defaultIPRange;
+            rangeBadge.textContent = `📡 ${CONFIG.defaultIPRange}`;
+            state.currentIPRange = CONFIG.defaultIPRange;
+            
+            // Set backend URL
             backendUrlInput.value = CONFIG.backendUrl;
 
-            // Load quantum API key from config
+            // Load quantum API key
             if (CONFIG.quantumApiKey) {
                 quantumApiKeyInput.value = CONFIG.quantumApiKey;
                 setTimeout(connectQuantumAPI, 1500);
@@ -1844,28 +1958,28 @@
 
             // Initialize with demo devices
             for (let i = 0; i < 3; i++) {
-                state.devices.push(generateDemoDevice());
+                state.devices.push(generateDemoDevice(CONFIG.defaultIPRange));
             }
             
             updateDeviceList();
             updateStats();
             drawTopology();
 
-            addAIThought(`⚡ Welcome ${state.userName}! This is YOUR Personal ECHOPLEX`);
-            addAIThought(`🌐 Click "Scan MY Network" to discover YOUR devices`);
-            addAIThought(`🔒 YOUR data stays on YOUR device - Not shared`);
-            addLogEntry(`🟢 ${state.userName} started ECHOPLEX Personal Edition`, 'success');
+            addAIThought(`⚡ Welcome ${state.userName}!`);
+            addAIThought(`🌐 Enter any IP range to scan`);
+            addAIThought(`📡 Examples: 192.168.1.0/24, 10.0.0.0/24`);
+            addLogEntry(`🟢 ECHOPLEX Personal Scanner started`, 'success');
 
             window.addEventListener('resize', resizeTopology);
             setInterval(updateClock, 1000);
             updateClock();
             setInterval(updateStats, 3000);
             
-            // Check backend after 2 seconds
+            // Check backend
             setTimeout(checkBackendStatus, 2000);
 
             setTimeout(() => {
-                showToast(`👤 Welcome ${state.userName}`, 'Click "Scan MY Network" to discover YOUR devices');
+                showToast(`👤 Welcome ${state.userName}`, 'Enter an IP range and click Scan');
             }, 1500);
         }
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-ECHOPLEX Backend Server - Personal Network Scanner
-Each user scans THEIR OWN network
+ECHOPLEX Backend Server - Supports ANY IP Range
+Each user can scan ANY IP range they want
 URL: https://echoplex-net-solutions.onrender.com
 """
 
@@ -9,7 +9,8 @@ import subprocess
 import json
 import socket
 import os
-from flask import Flask, jsonify, request, session
+import re
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 
 app = Flask(__name__)
@@ -17,18 +18,25 @@ app.secret_key = os.urandom(24)
 CORS(app)
 
 # ============================================================
-#  🔑 LOAD QUANTUM API KEY FROM ENVIRONMENT VARIABLES
+#  🔑 LOAD QUANTUM API KEY
 # ============================================================
 QUANTUM_API_KEY = os.environ.get('QUANTUM_API_KEY', '')
 QUANTUM_API_URL = os.environ.get('QUANTUM_API_URL', 'https://quantum.ibm.com/api')
 
 print(f"🔑 QUANTUM_API_KEY loaded: {'✅' if QUANTUM_API_KEY else '❌ Not set'}")
 
-def get_network_range():
-    """Get the local network range for the user making the request"""
+def get_network_range_from_request():
+    """Get network range from request parameters or auto-detect"""
+    # Check if range is provided in request
+    range_param = request.args.get('range') if request else None
+    
+    if range_param and range_param != '':
+        # Validate IP range format
+        if re.match(r'^(\d{1,3}\.){3}\d{1,3}(\/\d{1,2})?$', range_param):
+            return range_param
+    
+    # Auto-detect based on request IP
     try:
-        # Get the user's IP from the request
-        # In production, this would use the actual client IP
         hostname = socket.gethostname()
         local_ip = socket.gethostbyname(hostname)
         ip_parts = local_ip.split('.')
@@ -36,20 +44,32 @@ def get_network_range():
     except:
         return "192.168.1.0/24"
 
-def scan_network(network_range=None, user_ip=None):
-    """Scan network for active devices - each user gets THEIR network"""
+def scan_network(network_range=None):
+    """Scan network for active devices in the specified range"""
     if not network_range:
-        network_range = get_network_range()
+        network_range = "192.168.1.0/24"
     
-    # Extract base IP
-    base = network_range.replace('/24', '')
+    # Parse network range
+    if '/' in network_range:
+        base, subnet = network_range.split('/')
+    else:
+        base = network_range
+        subnet = '24'
+    
     base_parts = base.split('.')
+    if len(base_parts) != 4:
+        return []
+    
     base_ip = f"{base_parts[0]}.{base_parts[1]}.{base_parts[2]}"
+    
+    # Determine start and end IPs based on subnet
+    start = int(base_parts[3]) if base_parts[3].isdigit() else 1
+    end = 254
     
     devices = []
     
     # Scan all IPs in range
-    for i in range(1, 255):
+    for i in range(start, end + 1):
         ip = f"{base_ip}.{i}"
         try:
             # Use ping to check if device is active
@@ -97,6 +117,10 @@ def scan_network(network_range=None, user_ip=None):
                     device_type = "📡 Router"
                 elif 'printer' in hostname_lower:
                     device_type = "🖨 Printer"
+                elif 'camera' in hostname_lower or 'cam' in hostname_lower:
+                    device_type = "📷 Camera"
+                elif 'tv' in hostname_lower or 'television' in hostname_lower:
+                    device_type = "📺 Smart TV"
                 
                 devices.append({
                     'ip': ip,
@@ -114,7 +138,7 @@ def scan_network(network_range=None, user_ip=None):
     return devices
 
 # ============================================================
-#  QUANTUM API ENDPOINTS (Per User)
+#  QUANTUM API ENDPOINTS
 # ============================================================
 
 @app.route('/api/quantum/status', methods=['GET'])
@@ -139,10 +163,9 @@ def quantum_analyze():
     data = request.get_json()
     devices = data.get('devices', [])
     
-    # Simulate quantum analysis (each user gets their own analysis)
     quantum_results = {
         'status': 'success',
-        'user_id': request.remote_addr,
+        'user_ip': request.remote_addr,
         'analysis_type': 'quantum_neural_network',
         'devices_analyzed': len(devices),
         'quantum_confidence': 98.5,
@@ -157,28 +180,30 @@ def quantum_analyze():
     return jsonify(quantum_results)
 
 # ============================================================
-#  NETWORK SCAN ENDPOINT (Personal - Each User Scans Their Own)
+#  NETWORK SCAN ENDPOINT - ANY IP RANGE
 # ============================================================
 
 @app.route('/api/scan-network', methods=['GET'])
 def scan_network_endpoint():
-    """API endpoint to scan user's network - EACH USER SCANS THEIR OWN"""
+    """API endpoint to scan ANY IP range - user specifies what to scan"""
     user_ip = request.remote_addr
+    
+    # Get the range from request parameters
     network_range = request.args.get('range')
-    if not network_range:
-        network_range = get_network_range()
+    if not network_range or network_range == '':
+        network_range = get_network_range_from_request()
     
-    print(f"👤 User {user_ip} scanning THEIR network: {network_range}")
-    devices = scan_network(network_range, user_ip)
-    print(f"✅ Found {len(devices)} devices on user's network")
+    print(f"👤 User {user_ip} scanning: {network_range}")
+    devices = scan_network(network_range)
+    print(f"✅ Found {len(devices)} devices")
     
-    # Add quantum protection status if key is configured
     response_data = {
         'devices': devices,
         'quantum_enabled': bool(QUANTUM_API_KEY),
         'total_devices': len(devices),
         'user_ip': user_ip,
-        'message': f'Secured network for {user_ip}'
+        'scanned_range': network_range,
+        'message': f'Scanned {network_range}'
     }
     
     return jsonify(response_data)
@@ -192,7 +217,7 @@ def status():
         'server': 'Render.com - echoplex-net-solutions',
         'quantum_connected': bool(QUANTUM_API_KEY),
         'quantum_url': QUANTUM_API_URL,
-        'message': 'Each user scans THEIR own network'
+        'message': 'Users can scan ANY IP range'
     })
 
 @app.route('/api/health', methods=['GET'])
@@ -209,12 +234,12 @@ def index():
         'status': 'running',
         'backend_url': 'https://echoplex-net-solutions.onrender.com',
         'quantum_enabled': bool(QUANTUM_API_KEY),
-        'message': 'Each user scans THEIR OWN network - Your data stays yours',
+        'message': 'Users can scan ANY IP range',
         'endpoints': {
             '/api/status': 'Check server status',
-            '/api/scan-network': 'Scan YOUR network for devices',
+            '/api/scan-network?range=192.168.1.0/24': 'Scan ANY IP range',
             '/api/quantum/status': 'Quantum API status',
-            '/api/quantum/analyze': 'Run quantum analysis on YOUR network',
+            '/api/quantum/analyze': 'Run quantum analysis',
             '/api/health': 'Health check'
         }
     })
@@ -224,7 +249,6 @@ if __name__ == '__main__':
     print(f"⚡ ECHOPLEX Personal Backend Server Starting...")
     print(f"🌐 Backend URL: https://echoplex-net-solutions.onrender.com")
     print(f"🔑 Quantum API: {'✅ Configured' if QUANTUM_API_KEY else '❌ Not configured'}")
-    print(f"👤 Each user scans THEIR OWN network")
-    print(f"🔒 Your data stays on YOUR device")
+    print(f"📡 Users can scan ANY IP range")
     print(f"🔗 Server running on port: {port}")
     app.run(host='0.0.0.0', port=port, debug=False)

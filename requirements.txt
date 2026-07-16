@@ -1,4 +1,4 @@
 txt
-flask
-flask-cors
+Flask
+Flask-CORS
 flask-session

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-ECHOPLEX Backend Server - Supports ANY IP Range
-Each user can scan ANY IP range they want
+ECHOPLEX Backend Server - Specific IP Scanner
+Users can scan any specific IP address
 URL: https://echoplex-net-solutions.onrender.com
 """
 
@@ -25,117 +25,87 @@ QUANTUM_API_URL = os.environ.get('QUANTUM_API_URL', 'https://quantum.ibm.com/api
 
 print(f"🔑 QUANTUM_API_KEY loaded: {'✅' if QUANTUM_API_KEY else '❌ Not set'}")
 
-def get_network_range_from_request():
-    """Get network range from request parameters or auto-detect"""
-    # Check if range is provided in request
-    range_param = request.args.get('range') if request else None
+def scan_specific_ip(ip):
+    """Scan a specific IP address"""
+    if not ip:
+        return {'error': 'No IP provided'}
     
-    if range_param and range_param != '':
-        # Validate IP range format
-        if re.match(r'^(\d{1,3}\.){3}\d{1,3}(\/\d{1,2})?$', range_param):
-            return range_param
+    # Validate IP format
+    ip_pattern = re.compile(r'^(\d{1,3}\.){3}\d{1,3}$')
+    if not ip_pattern.match(ip):
+        return {'error': 'Invalid IP format'}
     
-    # Auto-detect based on request IP
+    device = {
+        'ip': ip,
+        'hostname': ip,
+        'mac': 'Unknown',
+        'type': '💻 Device',
+        'os': 'Unknown',
+        'online': False
+    }
+    
     try:
-        hostname = socket.gethostname()
-        local_ip = socket.gethostbyname(hostname)
-        ip_parts = local_ip.split('.')
-        return f"{ip_parts[0]}.{ip_parts[1]}.{ip_parts[2]}.0/24"
-    except:
-        return "192.168.1.0/24"
-
-def scan_network(network_range=None):
-    """Scan network for active devices in the specified range"""
-    if not network_range:
-        network_range = "192.168.1.0/24"
-    
-    # Parse network range
-    if '/' in network_range:
-        base, subnet = network_range.split('/')
-    else:
-        base = network_range
-        subnet = '24'
-    
-    base_parts = base.split('.')
-    if len(base_parts) != 4:
-        return []
-    
-    base_ip = f"{base_parts[0]}.{base_parts[1]}.{base_parts[2]}"
-    
-    # Determine start and end IPs based on subnet
-    start = int(base_parts[3]) if base_parts[3].isdigit() else 1
-    end = 254
-    
-    devices = []
-    
-    # Scan all IPs in range
-    for i in range(start, end + 1):
-        ip = f"{base_ip}.{i}"
-        try:
-            # Use ping to check if device is active
-            result = subprocess.run(
-                ['ping', '-n', '1', '-w', '100', ip],
-                capture_output=True,
-                text=True,
-                timeout=2
-            )
+        # Ping the IP
+        result = subprocess.run(
+            ['ping', '-n', '1', '-w', '200', ip],
+            capture_output=True,
+            text=True,
+            timeout=2
+        )
+        
+        if result.returncode == 0:
+            device['online'] = True
             
-            if result.returncode == 0:
-                # Try to get hostname
-                try:
-                    hostname = socket.gethostbyaddr(ip)[0]
-                except:
-                    hostname = f"Device-{i}"
-                
-                # Try to get MAC address
-                mac = "Unknown"
-                try:
-                    arp_result = subprocess.run(
-                        ['arp', '-a', ip],
-                        capture_output=True,
-                        text=True
-                    )
-                    for line in arp_result.stdout.split('\n'):
-                        if ip in line:
-                            parts = line.split()
-                            if len(parts) >= 3:
-                                mac = parts[1] if len(parts) > 1 else "Unknown"
-                            break
-                except:
-                    pass
-                
-                # Detect device type from hostname
-                device_type = "💻 Device"
-                hostname_lower = hostname.lower()
-                if 'server' in hostname_lower:
-                    device_type = "🖥 Server"
-                elif 'phone' in hostname_lower or 'iphone' in hostname_lower:
-                    device_type = "📱 Mobile"
-                elif 'laptop' in hostname_lower:
-                    device_type = "💻 Laptop"
-                elif 'router' in hostname_lower or 'switch' in hostname_lower:
-                    device_type = "📡 Router"
-                elif 'printer' in hostname_lower:
-                    device_type = "🖨 Printer"
-                elif 'camera' in hostname_lower or 'cam' in hostname_lower:
-                    device_type = "📷 Camera"
-                elif 'tv' in hostname_lower or 'television' in hostname_lower:
-                    device_type = "📺 Smart TV"
-                
-                devices.append({
-                    'ip': ip,
-                    'hostname': hostname,
-                    'mac': mac,
-                    'type': device_type,
-                    'os': 'Unknown'
-                })
-                
-                print(f"Found: {ip} - {hostname}")
-                
-        except Exception as e:
-            pass
+            # Try to get hostname
+            try:
+                hostname = socket.gethostbyaddr(ip)[0]
+                device['hostname'] = hostname
+            except:
+                pass
+            
+            # Try to get MAC address
+            try:
+                arp_result = subprocess.run(
+                    ['arp', '-a', ip],
+                    capture_output=True,
+                    text=True
+                )
+                for line in arp_result.stdout.split('\n'):
+                    if ip in line:
+                        parts = line.split()
+                        if len(parts) >= 3:
+                            device['mac'] = parts[1] if len(parts) > 1 else "Unknown"
+                        break
+            except:
+                pass
+            
+            # Detect device type from hostname
+            hostname_lower = device['hostname'].lower()
+            if 'server' in hostname_lower:
+                device['type'] = '🖥 Server'
+            elif 'phone' in hostname_lower or 'iphone' in hostname_lower:
+                device['type'] = '📱 Mobile'
+            elif 'laptop' in hostname_lower:
+                device['type'] = '💻 Laptop'
+            elif 'router' in hostname_lower or 'switch' in hostname_lower:
+                device['type'] = '📡 Router'
+            elif 'printer' in hostname_lower:
+                device['type'] = '🖨 Printer'
+            elif 'camera' in hostname_lower or 'cam' in hostname_lower:
+                device['type'] = '📷 Camera'
+            elif 'tv' in hostname_lower or 'television' in hostname_lower:
+                device['type'] = '📺 Smart TV'
+            
+            print(f"✅ Found: {ip} - {device['hostname']}")
+        else:
+            print(f"❌ No response from: {ip}")
+            return {'error': 'Device not responding to ping', 'ip': ip}
+            
+    except Exception as e:
+        print(f"⚠️ Error scanning {ip}: {str(e)}")
+        return {'error': str(e), 'ip': ip}
     
-    return devices
+    return device
 
 # ============================================================
 #  QUANTUM API ENDPOINTS
@@ -153,7 +123,7 @@ def quantum_status():
 
 @app.route('/api/quantum/analyze', methods=['POST'])
 def quantum_analyze():
-    """Run quantum analysis on user's network data"""
+    """Run quantum analysis on user's device data"""
     if not QUANTUM_API_KEY:
         return jsonify({
             'error': 'Quantum API key not configured',
@@ -180,30 +150,29 @@ def quantum_analyze():
     return jsonify(quantum_results)
 
 # ============================================================
-#  NETWORK SCAN ENDPOINT - ANY IP RANGE
+#  SPECIFIC IP SCAN ENDPOINT
 # ============================================================
 
-@app.route('/api/scan-network', methods=['GET'])
-def scan_network_endpoint():
-    """API endpoint to scan ANY IP range - user specifies what to scan"""
+@app.route('/api/scan-ip', methods=['GET'])
+def scan_ip_endpoint():
+    """API endpoint to scan a specific IP address"""
     user_ip = request.remote_addr
+    target_ip = request.args.get('ip')
     
-    # Get the range from request parameters
-    network_range = request.args.get('range')
-    if not network_range or network_range == '':
-        network_range = get_network_range_from_request()
+    if not target_ip:
+        return jsonify({'error': 'No IP provided', 'status': 'error'}), 400
     
-    print(f"👤 User {user_ip} scanning: {network_range}")
-    devices = scan_network(network_range)
-    print(f"✅ Found {len(devices)} devices")
+    print(f"👤 User {user_ip} scanning IP: {target_ip}")
+    device = scan_specific_ip(target_ip)
+    
+    if 'error' in device:
+        return jsonify({'error': device['error'], 'ip': target_ip, 'status': 'error'}), 404
     
     response_data = {
-        'devices': devices,
+        'device': device,
         'quantum_enabled': bool(QUANTUM_API_KEY),
-        'total_devices': len(devices),
         'user_ip': user_ip,
-        'scanned_range': network_range,
-        'message': f'Scanned {network_range}'
+        'message': f'Scanned {target_ip}'
     }
     
     return jsonify(response_data)
@@ -217,7 +186,7 @@ def status():
         'server': 'Render.com - echoplex-net-solutions',
         'quantum_connected': bool(QUANTUM_API_KEY),
         'quantum_url': QUANTUM_API_URL,
-        'message': 'Users can scan ANY IP range'
+        'message': 'Users can scan specific IP addresses'
     })
 
 @app.route('/api/health', methods=['GET'])
@@ -234,10 +203,10 @@ def index():
         'status': 'running',
         'backend_url': 'https://echoplex-net-solutions.onrender.com',
         'quantum_enabled': bool(QUANTUM_API_KEY),
-        'message': 'Users can scan ANY IP range',
+        'message': 'Users can scan specific IP addresses',
         'endpoints': {
             '/api/status': 'Check server status',
-            '/api/scan-network?range=192.168.1.0/24': 'Scan ANY IP range',
+            '/api/scan-ip?ip=192.168.1.1': 'Scan a specific IP',
             '/api/quantum/status': 'Quantum API status',
             '/api/quantum/analyze': 'Run quantum analysis',
             '/api/health': 'Health check'
@@ -249,6 +218,6 @@ if __name__ == '__main__':
     print(f"⚡ ECHOPLEX Personal Backend Server Starting...")
     print(f"🌐 Backend URL: https://echoplex-net-solutions.onrender.com")
     print(f"🔑 Quantum API: {'✅ Configured' if QUANTUM_API_KEY else '❌ Not configured'}")
-    print(f"📡 Users can scan ANY IP range")
+    print(f"📡 Users can scan specific IP addresses")
     print(f"🔗 Server running on port: {port}")
     app.run(host='0.0.0.0', port=port, debug=False)

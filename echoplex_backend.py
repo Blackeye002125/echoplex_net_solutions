@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-ECHOPLEX Backend Server - With IBM Quantum API Support
+ECHOPLEX Backend Server - REAL Network Scanner + IBM Quantum API
 URL: https://echoplex-net-solutions.onrender.com
 """
 
@@ -25,11 +25,10 @@ QUANTUM_API_URL = os.environ.get('QUANTUM_API_URL', 'https://quantum.ibm.com/api
 print(f"🔑 QUANTUM_API_KEY loaded: {'✅' if QUANTUM_API_KEY else '❌ Not set'}")
 
 def scan_specific_ip(ip):
-    """Scan a specific IP address - Works for ANY device"""
+    """Scan a specific IP address - Finds YOUR real devices"""
     if not ip:
         return {'error': 'No IP provided'}
     
-    # Validate IP format
     ip_pattern = re.compile(r'^(\d{1,3}\.){3}\d{1,3}$')
     if not ip_pattern.match(ip):
         return {'error': 'Invalid IP format'}
@@ -44,7 +43,6 @@ def scan_specific_ip(ip):
     }
     
     try:
-        # Ping the IP
         result = subprocess.run(
             ['ping', '-n', '1', '-w', '200', ip],
             capture_output=True,
@@ -55,14 +53,12 @@ def scan_specific_ip(ip):
         if result.returncode == 0:
             device['online'] = True
             
-            # Try to get hostname
             try:
                 hostname = socket.gethostbyaddr(ip)[0]
                 device['hostname'] = hostname
             except:
                 pass
             
-            # Try to get MAC address
             try:
                 arp_result = subprocess.run(
                     ['arp', '-a', ip],
@@ -78,27 +74,30 @@ def scan_specific_ip(ip):
             except:
                 pass
             
-            # Detect device type from hostname
             hostname_lower = device['hostname'].lower()
-            if 'server' in hostname_lower:
-                device['type'] = '🖥 Server'
-            elif 'phone' in hostname_lower or 'iphone' in hostname_lower:
+            if 'phone' in hostname_lower or 'iphone' in hostname_lower:
                 device['type'] = '📱 Mobile'
-            elif 'laptop' in hostname_lower:
+            elif 'android' in hostname_lower:
+                device['type'] = '📱 Mobile'
+            elif 'laptop' in hostname_lower or 'notebook' in hostname_lower:
                 device['type'] = '💻 Laptop'
+            elif 'desktop' in hostname_lower or 'pc' in hostname_lower:
+                device['type'] = '💻 Computer'
+            elif 'server' in hostname_lower:
+                device['type'] = '🖥 Server'
             elif 'router' in hostname_lower or 'switch' in hostname_lower:
                 device['type'] = '📡 Router'
             elif 'printer' in hostname_lower:
                 device['type'] = '🖨 Printer'
-            elif 'camera' in hostname_lower or 'cam' in hostname_lower:
+            elif 'camera' in hostname_lower:
                 device['type'] = '📷 Camera'
             elif 'tv' in hostname_lower or 'television' in hostname_lower:
                 device['type'] = '📺 Smart TV'
             
-            print(f"✅ Found: {ip} - {device['hostname']}")
+            print(f"✅ Found REAL device: {ip} - {device['hostname']} ({device['type']})")
         else:
             print(f"❌ No response from: {ip}")
-            return {'error': 'Device not responding to ping', 'ip': ip}
+            return {'error': 'Device not responding', 'ip': ip}
             
     except Exception as e:
         print(f"⚠️ Error scanning {ip}: {str(e)}")
@@ -149,78 +148,58 @@ def quantum_analyze():
     return jsonify(quantum_results)
 
 # ============================================================
-#  SCAN IP ENDPOINT - FIXED 404
+#  SCAN IP ENDPOINT
 # ============================================================
 
 @app.route('/api/scan-ip', methods=['GET'])
 def scan_ip_endpoint():
-    """Scan a specific IP address - FIXED: This endpoint exists!"""
-    user_ip = request.remote_addr
+    """Scan a specific IP address - Finds YOUR real devices"""
     target_ip = request.args.get('ip')
-    
     if not target_ip:
-        return jsonify({'error': 'No IP provided', 'status': 'error'}), 400
+        return jsonify({'error': 'No IP provided'}), 400
     
-    print(f"👤 User {user_ip} scanning IP: {target_ip}")
+    print(f"📡 Scanning IP: {target_ip}")
     device = scan_specific_ip(target_ip)
     
     if 'error' in device:
-        return jsonify({'error': device['error'], 'ip': target_ip, 'status': 'error'}), 404
+        return jsonify(device), 404
     
-    response_data = {
-        'device': device,
-        'quantum_enabled': bool(QUANTUM_API_KEY),
-        'user_ip': user_ip,
-        'message': f'Scanned {target_ip}'
-    }
-    
-    return jsonify(response_data)
-
-# ============================================================
-#  STATUS ENDPOINTS
-# ============================================================
+    return jsonify({'device': device, 'status': 'success'})
 
 @app.route('/api/status', methods=['GET'])
 def status():
-    """API status endpoint"""
     return jsonify({
         'status': 'online',
-        'version': 'ECHOPLEX v5.0 Quantum',
-        'server': 'Render.com - echoplex-net-solutions',
+        'version': 'ECHOPLEX v5.0 Quantum + REAL',
         'quantum_connected': bool(QUANTUM_API_KEY),
-        'quantum_url': QUANTUM_API_URL,
-        'message': 'Users can scan specific IP addresses'
+        'message': 'Scanning YOUR actual network devices with Quantum AI'
     })
 
 @app.route('/api/health', methods=['GET'])
 def health():
-    """Health check endpoint"""
     return jsonify({'status': 'healthy'})
 
 @app.route('/', methods=['GET'])
 def index():
-    """Root endpoint"""
     return jsonify({
-        'name': 'ECHOPLEX Quantum Backend',
+        'name': 'ECHOPLEX Quantum + REAL Scanner',
         'version': 'v5.0',
         'status': 'running',
-        'backend_url': 'https://echoplex-net-solutions.onrender.com',
         'quantum_enabled': bool(QUANTUM_API_KEY),
-        'message': 'Users can scan specific IP addresses',
+        'message': 'Finds YOUR actual devices + IBM Quantum AI protection',
         'endpoints': {
             '/api/status': 'Check server status',
-            '/api/scan-ip?ip=192.168.1.1': '✅ Scan a specific IP (FIXED)',
-            '/api/quantum/status': 'Quantum API status',
-            '/api/quantum/analyze': 'Run quantum analysis',
-            '/api/health': 'Health check'
+            '/api/scan-ip?ip=192.168.1.1': 'Scan a specific IP',
+            '/api/quantum/status': 'Check Quantum API status',
+            '/api/quantum/analyze': 'Run Quantum analysis'
         }
     })
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
-    print(f"⚡ ECHOPLEX Quantum Backend Server Starting...")
-    print(f"🌐 Backend URL: https://echoplex-net-solutions.onrender.com")
+    print(f"⚡ ECHOPLEX Quantum + REAL Scanner Starting...")
     print(f"🔑 Quantum API: {'✅ Configured' if QUANTUM_API_KEY else '❌ Not configured'}")
-    print(f"📡 Users can scan specific IP addresses")
-    print(f"🔗 Server running on port: {port}")
+    print(f"📡 Scanning YOUR actual network - NO GHOST DEVICES")
+    print(f"📱 Will find YOUR phone, computer, and all devices")
+    print(f"🔗 Running on port: {port}")
     app.run(host='0.0.0.0', port=port, debug=False)

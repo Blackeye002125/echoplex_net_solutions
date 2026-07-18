@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ECHOPLEX - Personal IP Scanner</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ECHOPLEX - Network Scanner</title>
     <style>
         /* ===== RESET & BASE ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -21,163 +21,120 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: -apple-system, 'Segoe UI', Roboto, sans-serif;
             background: var(--dark-bg);
             color: var(--text);
             min-height: 100vh;
-            padding: 12px;
+            padding: 10px;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        .dashboard { max-width: 1920px; margin: 0 auto; }
+        .dashboard { max-width: 1200px; margin: 0 auto; }
 
         /* ===== HEADER ===== */
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 16px 28px;
+            padding: 12px 20px;
             background: linear-gradient(135deg, rgba(17, 24, 39, 0.95), rgba(30, 58, 95, 0.8));
-            border-radius: 16px;
-            margin-bottom: 18px;
+            border-radius: 14px;
+            margin-bottom: 14px;
             border: 1px solid rgba(0, 212, 255, 0.15);
-            backdrop-filter: blur(20px);
             flex-wrap: wrap;
-            gap: 12px;
-            position: relative;
-            overflow: hidden;
+            gap: 8px;
         }
 
-        .header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: conic-gradient(from 0deg, transparent, rgba(0, 212, 255, 0.03), transparent, rgba(124, 58, 237, 0.03), transparent);
-            animation: rotate 20s linear infinite;
-        }
-
-        @keyframes rotate { to { transform: rotate(360deg); } }
-
-        .logo-area { display: flex; align-items: center; gap: 16px; position: relative; z-index: 1; }
+        .logo-area { display: flex; align-items: center; gap: 10px; }
         .logo-icon {
-            width: 56px; height: 56px;
+            width: 40px; height: 40px;
             background: linear-gradient(135deg, var(--primary), var(--secondary));
-            border-radius: 16px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 28px;
+            font-size: 20px;
             font-weight: 900;
             color: white;
-            box-shadow: 0 0 60px rgba(0, 212, 255, 0.2);
-            animation: logoPulse 3s ease-in-out infinite;
-            position: relative;
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.2);
         }
-
-        .logo-icon::after {
-            content: '';
-            position: absolute;
-            inset: -2px;
-            border-radius: 18px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary), var(--primary));
-            z-index: -1;
-            opacity: 0.3;
-            animation: logoGlow 2s ease-in-out infinite;
-        }
-
-        @keyframes logoPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
-        @keyframes logoGlow { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.6; } }
 
         .logo-text h1 {
-            font-family: 'Orbitron', monospace;
-            font-size: 26px;
-            font-weight: 900;
-            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--primary));
-            background-size: 200% auto;
+            font-size: 18px;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            animation: shimmer 3s linear infinite;
-            letter-spacing: 2px;
+            letter-spacing: 1px;
         }
+        .logo-text span { font-size: 9px; color: var(--text-muted); display: block; -webkit-text-fill-color: var(--text-muted); }
 
-        @keyframes shimmer { to { background-position: 200% center; } }
-        .logo-text span { font-size: 11px; color: var(--text-muted); letter-spacing: 3px; text-transform: uppercase; display: block; font-weight: 300; }
+        .header-status { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .status-badge { display: flex; align-items: center; gap: 5px; font-size: 10px; padding: 4px 12px; border-radius: 16px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.05); }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; animation: pulse 2s infinite; }
+        .status-dot.green { background: var(--success); box-shadow: 0 0 15px rgba(0,255,136,0.3); }
+        .status-dot.yellow { background: var(--warning); animation: pulse-fast 1s infinite; }
+        .status-dot.red { background: var(--danger); animation: pulse-fast 0.5s infinite; }
 
-        .header-status { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; position: relative; z-index: 1; }
-        .status-badge { display: flex; align-items: center; gap: 8px; font-size: 12px; padding: 6px 16px; border-radius: 20px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.05); backdrop-filter: blur(10px); }
-        .status-dot { width: 10px; height: 10px; border-radius: 50%; animation: pulse 2s infinite; }
-        .status-dot.green { background: var(--success); box-shadow: 0 0 20px rgba(0,255,136,0.3); }
-        .status-dot.yellow { background: var(--warning); box-shadow: 0 0 20px rgba(255,170,0,0.3); animation: pulse-fast 1s infinite; }
-        .status-dot.red { background: var(--danger); box-shadow: 0 0 30px rgba(255,0,64,0.5); animation: pulse-fast 0.5s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        @keyframes pulse-fast { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
-        @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.9); } }
-        @keyframes pulse-fast { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.3; transform: scale(0.8); } }
-
-        .time-display { font-family: 'Orbitron', monospace; font-size: 14px; color: var(--primary); letter-spacing: 1px; }
+        .time-display { font-size: 11px; color: var(--primary); font-family: monospace; }
 
         /* ===== STATS ===== */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 12px;
-            margin-bottom: 18px;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 8px;
+            margin-bottom: 14px;
         }
 
         .stat-card {
             background: linear-gradient(135deg, rgba(17,24,39,0.9), rgba(30,58,95,0.5));
             border: 1px solid rgba(255,255,255,0.05);
-            border-radius: 12px;
-            padding: 14px 18px;
-            transition: all 0.3s;
-            backdrop-filter: blur(10px);
-            position: relative;
-            overflow: hidden;
+            border-radius: 10px;
+            padding: 10px 14px;
+            text-align: center;
         }
 
-        .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--primary), var(--secondary)); opacity: 0.5; }
-        .stat-card:hover { border-color: rgba(0,212,255,0.2); transform: translateY(-3px); box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
-        .stat-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); font-weight: 600; }
-        .stat-value { font-size: 28px; font-weight: 700; margin-top: 4px; font-family: 'Orbitron', monospace; }
+        .stat-label { font-size: 8px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); }
+        .stat-value { font-size: 22px; font-weight: 700; font-family: monospace; }
         .stat-value.danger { color: var(--danger); }
         .stat-value.warning { color: var(--warning); }
         .stat-value.success { color: var(--success); }
         .stat-value.info { color: var(--primary); }
         .stat-value.purple { color: var(--secondary); }
-        .stat-sub { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
+        .stat-sub { font-size: 8px; color: var(--text-muted); }
 
         /* ===== PANELS ===== */
         .panel {
             background: linear-gradient(135deg, rgba(17,24,39,0.95), rgba(30,58,95,0.7));
             border: 1px solid rgba(255,255,255,0.05);
-            border-radius: 14px;
+            border-radius: 12px;
             overflow: hidden;
-            backdrop-filter: blur(10px);
+            margin-bottom: 12px;
         }
 
         .panel-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 18px;
+            padding: 10px 14px;
             border-bottom: 1px solid rgba(255,255,255,0.05);
             flex-wrap: wrap;
-            gap: 8px;
+            gap: 6px;
         }
 
-        .panel-title { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
-        .panel-title .badge { font-size: 9px; padding: 2px 12px; border-radius: 12px; background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.2); color: var(--primary); font-weight: 400; letter-spacing: 0.5px; }
-        .panel-title .badge.quantum { background: rgba(124,58,237,0.2); border-color: var(--secondary); color: var(--secondary); }
-        .panel-title .badge.personal { background: rgba(0,255,136,0.15); border-color: var(--success); color: var(--success); }
+        .panel-title { font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+        .panel-title .badge { font-size: 8px; padding: 2px 10px; border-radius: 10px; background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.2); color: var(--primary); }
 
-        .panel-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+        .panel-actions { display: flex; gap: 4px; flex-wrap: wrap; }
 
         .btn {
-            padding: 5px 14px;
-            border-radius: 8px;
+            padding: 4px 12px;
+            border-radius: 6px;
             border: none;
-            font-size: 10px;
+            font-size: 9px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
@@ -186,35 +143,85 @@
             border: 1px solid rgba(255,255,255,0.05);
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            font-family: 'Segoe UI', sans-serif;
+            font-family: inherit;
+            touch-action: manipulation;
         }
 
-        .btn:hover { transform: scale(1.05); box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
+        .btn:hover { transform: scale(1.05); }
         .btn-danger { background: var(--danger); color: white; border-color: var(--danger); }
-        .btn-danger:hover { background: #ff0040; box-shadow: 0 0 30px rgba(255,0,64,0.3); }
         .btn-success { background: var(--success); color: #000; border-color: var(--success); }
-        .btn-success:hover { background: #00ff88; box-shadow: 0 0 30px rgba(0,255,136,0.3); }
         .btn-primary { background: var(--primary); color: #000; border-color: var(--primary); }
-        .btn-primary:hover { background: #00d4ff; box-shadow: 0 0 30px rgba(0,212,255,0.3); }
         .btn-purple { background: var(--secondary); color: white; border-color: var(--secondary); }
-        .btn-purple:hover { background: #7c3aed; box-shadow: 0 0 30px rgba(124,58,237,0.3); }
         .btn-warning { background: var(--warning); color: #000; border-color: var(--warning); }
-        .btn-warning:hover { background: #ffaa00; box-shadow: 0 0 30px rgba(255,170,0,0.3); }
-        .btn-quantum { background: linear-gradient(135deg, var(--secondary), var(--primary)); color: white; border-color: var(--secondary); }
-        .btn-quantum:hover { box-shadow: 0 0 40px rgba(124,58,237,0.5); }
 
-        .panel-body { padding: 14px 18px; max-height: 500px; overflow-y: auto; }
-        .panel-body::-webkit-scrollbar { width: 4px; }
-        .panel-body::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); }
-        .panel-body::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 4px; }
+        .panel-body { padding: 10px 12px; max-height: 400px; overflow-y: auto; }
+
+        /* ===== IP INPUT ===== */
+        .ip-input-section {
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+            padding: 10px;
+            border: 1px solid rgba(255,255,255,0.05);
+            margin-bottom: 10px;
+        }
+
+        .ip-input-section .ip-row {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .ip-input-section label { font-size: 10px; color: var(--text-muted); }
+        .ip-input-section input[type="text"] {
+            flex: 1;
+            padding: 6px 10px;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 6px;
+            color: var(--text);
+            font-family: monospace;
+            font-size: 12px;
+            min-width: 120px;
+            -webkit-appearance: none;
+        }
+
+        .ip-input-section input[type="text"]:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+
+        .ip-input-section .preset-ips {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+            margin-top: 6px;
+        }
+
+        .ip-input-section .preset-ips .preset-btn {
+            padding: 2px 8px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.05);
+            background: rgba(255,255,255,0.03);
+            color: var(--text-muted);
+            font-size: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            touch-action: manipulation;
+        }
+
+        .ip-input-section .preset-ips .preset-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
 
         /* ===== NETWORK TOPOLOGY ===== */
         .network-topology {
             position: relative;
-            min-height: 400px;
+            min-height: 300px;
             background: rgba(0,0,0,0.3);
-            border-radius: 10px;
-            padding: 12px;
+            border-radius: 8px;
+            padding: 10px;
             border: 1px solid rgba(255,255,255,0.05);
             overflow: hidden;
         }
@@ -223,376 +230,192 @@
 
         .topology-legend {
             position: absolute;
-            bottom: 10px;
-            right: 10px;
+            bottom: 6px;
+            right: 6px;
             display: flex;
-            gap: 10px;
-            font-size: 8px;
+            gap: 6px;
+            font-size: 7px;
             background: rgba(0,0,0,0.8);
-            padding: 5px 12px;
-            border-radius: 8px;
+            padding: 4px 10px;
+            border-radius: 6px;
             border: 1px solid rgba(255,255,255,0.05);
-            backdrop-filter: blur(10px);
             flex-wrap: wrap;
         }
 
-        .legend-item { display: flex; align-items: center; gap: 4px; }
-        .legend-dot { width: 8px; height: 8px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.1); }
+        .legend-item { display: flex; align-items: center; gap: 3px; }
+        .legend-dot { width: 6px; height: 6px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.1); }
         .legend-dot.safe { background: var(--success); }
         .legend-dot.warning { background: var(--warning); }
         .legend-dot.danger { background: var(--danger); }
         .legend-dot.blocked { background: #6b7a8f; }
-        .legend-dot.quantum { background: var(--secondary); animation: pulse-fast 0.5s infinite; }
-        .legend-dot.hub { background: var(--primary); animation: pulse 2s infinite; }
+        .legend-dot.hub { background: var(--primary); }
 
         /* ===== DEVICE LIST ===== */
-        .device-list { display: flex; flex-direction: column; gap: 5px; max-height: 320px; overflow-y: auto; }
-        .device-list::-webkit-scrollbar { width: 4px; }
-        .device-list::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
-        .device-list::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 4px; }
-        
+        .device-list { display: flex; flex-direction: column; gap: 4px; max-height: 280px; overflow-y: auto; }
+        .device-list::-webkit-scrollbar { width: 3px; }
+        .device-list::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 3px; }
+
         .device-item {
             display: flex;
             align-items: center;
-            gap: 10px;
-            padding: 8px 12px;
+            gap: 8px;
+            padding: 6px 10px;
             background: rgba(0,0,0,0.3);
-            border-radius: 8px;
+            border-radius: 6px;
             border-left: 3px solid rgba(255,255,255,0.1);
-            transition: all 0.3s;
             animation: slideIn 0.3s ease-out;
         }
 
-        @keyframes slideIn { from { opacity: 0; transform: translateX(-15px); } to { opacity: 1; transform: translateX(0); } }
-        .device-item:hover { background: rgba(0,212,255,0.05); }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
         .device-item.safe { border-left-color: var(--success); }
         .device-item.warning { border-left-color: var(--warning); background: rgba(255,170,0,0.05); }
         .device-item.danger { border-left-color: var(--danger); background: rgba(255,0,64,0.08); }
         .device-item.blocked { border-left-color: #6b7a8f; opacity: 0.6; }
-        .device-item.quantum-protected { border-left-color: var(--secondary); background: rgba(124,58,237,0.05); }
-        .device-item.your-device { border-left-color: var(--primary); background: rgba(0,212,255,0.05); }
 
-        .device-icon { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+        .device-icon { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0; }
         .device-icon.safe { background: rgba(0,255,136,0.1); }
         .device-icon.warning { background: rgba(255,170,0,0.1); }
         .device-icon.danger { background: rgba(255,0,64,0.1); }
         .device-icon.blocked { background: rgba(107,122,143,0.1); }
-        .device-icon.quantum-protected { background: rgba(124,58,237,0.15); }
-        .device-icon.your-device { background: rgba(0,212,255,0.15); }
 
         .device-info { flex: 1; min-width: 0; }
-        .device-info .name { font-weight: 600; font-size: 12px; }
-        .device-info .ip { font-size: 10px; color: var(--text-muted); font-family: 'Orbitron', monospace; }
-        .device-info .status-text { font-size: 9px; color: var(--text-muted); display: flex; gap: 6px; flex-wrap: wrap; }
-        .device-info .status-text .threat-tag { background: rgba(255,0,64,0.15); color: var(--danger); padding: 0 6px; border-radius: 4px; font-size: 8px; text-transform: uppercase; }
-        .device-info .status-text .real-tag { background: rgba(0,212,255,0.15); color: var(--primary); padding: 0 6px; border-radius: 4px; font-size: 8px; text-transform: uppercase; }
-        .device-info .status-text .quantum-tag { background: rgba(124,58,237,0.15); color: var(--secondary); padding: 0 6px; border-radius: 4px; font-size: 8px; text-transform: uppercase; }
-        .device-info .status-text .your-tag { background: rgba(0,255,136,0.15); color: var(--success); padding: 0 6px; border-radius: 4px; font-size: 8px; text-transform: uppercase; }
+        .device-info .name { font-weight: 600; font-size: 11px; }
+        .device-info .ip { font-size: 9px; color: var(--text-muted); font-family: monospace; }
+        .device-info .status-text { font-size: 8px; color: var(--text-muted); display: flex; gap: 4px; flex-wrap: wrap; }
+        .device-info .status-text .threat-tag { background: rgba(255,0,64,0.15); color: var(--danger); padding: 0 4px; border-radius: 3px; font-size: 7px; }
 
-        .device-actions { display: flex; gap: 4px; flex-shrink: 0; }
-        .device-actions .btn { padding: 2px 8px; font-size: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
-
-        /* ===== IP INPUT SECTION ===== */
-        .ip-input-section {
-            background: rgba(0,0,0,0.3);
-            border-radius: 10px;
-            padding: 14px;
-            border: 1px solid rgba(255,255,255,0.05);
-            margin-bottom: 12px;
-        }
-
-        .ip-input-section .ip-row {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        .ip-input-section label {
-            font-size: 11px;
-            color: var(--text-muted);
-            min-width: 80px;
-        }
-
-        .ip-input-section input[type="text"] {
-            flex: 1;
-            padding: 8px 12px;
-            background: rgba(0,0,0,0.5);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 6px;
-            color: var(--text);
-            font-family: 'Orbitron', monospace;
-            font-size: 11px;
-            min-width: 200px;
-        }
-
-        .ip-input-section input[type="text"]:focus {
-            border-color: var(--primary);
-            outline: none;
-            box-shadow: 0 0 20px rgba(0,212,255,0.1);
-        }
-
-        .ip-input-section .scan-badge {
-            font-size: 9px;
-            padding: 4px 12px;
-            border-radius: 12px;
-            background: rgba(0,212,255,0.1);
-            border: 1px solid rgba(0,212,255,0.2);
-            color: var(--primary);
-        }
-
-        .ip-input-section .preset-ips {
-            display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
-            margin-top: 8px;
-        }
-
-        .ip-input-section .preset-ips .preset-btn {
-            padding: 3px 10px;
-            border-radius: 12px;
-            border: 1px solid rgba(255,255,255,0.05);
-            background: rgba(255,255,255,0.03);
-            color: var(--text-muted);
-            font-size: 9px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .ip-input-section .preset-ips .preset-btn:hover {
-            border-color: var(--primary);
-            color: var(--primary);
-            background: rgba(0,212,255,0.05);
-        }
-
-        /* ===== CONFIG SECTION ===== */
-        .config-section {
-            background: rgba(0,0,0,0.3);
-            border-radius: 10px;
-            padding: 14px;
-            border: 1px solid rgba(255,255,255,0.05);
-        }
-
-        .config-section .config-row {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            margin-bottom: 8px;
-            flex-wrap: wrap;
-        }
-
-        .config-section label { font-size: 11px; color: var(--text-muted); min-width: 100px; }
-        .config-section input[type="text"], .config-section input[type="password"] {
-            flex: 1;
-            padding: 6px 10px;
-            background: rgba(0,0,0,0.5);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 6px;
-            color: var(--text);
-            font-family: 'Orbitron', monospace;
-            font-size: 10px;
-            min-width: 150px;
-        }
-
-        .config-section input[type="text"]:focus, .config-section input[type="password"]:focus {
-            border-color: var(--primary);
-            outline: none;
-            box-shadow: 0 0 20px rgba(0,212,255,0.1);
-        }
-
-        .config-section .api-status { display: inline-block; padding: 2px 10px; border-radius: 10px; font-size: 9px; font-weight: 600; }
-        .config-section .api-status.active { background: rgba(0,255,136,0.15); color: var(--success); }
-        .config-section .api-status.inactive { background: rgba(255,0,64,0.15); color: var(--danger); }
-        .config-section .api-status.quantum { background: rgba(124,58,237,0.15); color: var(--secondary); }
+        .device-actions { display: flex; gap: 3px; flex-shrink: 0; }
+        .device-actions .btn { padding: 2px 6px; font-size: 7px; text-transform: uppercase; }
 
         /* ===== AI THOUGHTS ===== */
         .ai-thoughts {
             background: rgba(0,0,0,0.3);
-            border-radius: 10px;
-            padding: 12px;
+            border-radius: 8px;
+            padding: 10px;
             border: 1px solid rgba(255,255,255,0.05);
-            min-height: 100px;
-            max-height: 180px;
+            min-height: 80px;
+            max-height: 150px;
             overflow-y: auto;
-            font-family: 'Orbitron', monospace;
-            font-size: 10px;
+            font-family: monospace;
+            font-size: 9px;
             color: var(--success);
             line-height: 1.8;
         }
 
-        .ai-thoughts::-webkit-scrollbar { width: 4px; }
-        .ai-thoughts::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); }
-        .ai-thoughts::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 4px; }
+        .ai-thoughts::-webkit-scrollbar { width: 3px; }
+        .ai-thoughts::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 3px; }
         .ai-thoughts .thought { opacity: 0; animation: fadeInThought 0.3s forwards; }
-        .ai-thoughts .thought .highlight { color: var(--warning); }
-        .ai-thoughts .thought .danger-text { color: var(--danger); }
-        .ai-thoughts .thought .success-text { color: var(--success); }
-        .ai-thoughts .thought .info-text { color: var(--primary); }
-        .ai-thoughts .thought .quantum-text { color: var(--secondary); }
         @keyframes fadeInThought { to { opacity: 1; } }
-        .thought-timestamp { color: var(--text-muted); font-size: 8px; font-family: 'Segoe UI', sans-serif; }
+        .thought-timestamp { color: var(--text-muted); font-size: 7px; }
 
         /* ===== ALERT LOG ===== */
-        .alert-log { display: flex; flex-direction: column; gap: 3px; max-height: 150px; overflow-y: auto; }
-        .alert-log::-webkit-scrollbar { width: 4px; }
-        .alert-log::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
-        .alert-log::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 4px; }
+        .alert-log { display: flex; flex-direction: column; gap: 2px; max-height: 120px; overflow-y: auto; }
+        .alert-log::-webkit-scrollbar { width: 3px; }
+        .alert-log::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 3px; }
         .log-entry {
             display: flex;
             justify-content: space-between;
-            padding: 4px 10px;
+            padding: 3px 8px;
             background: rgba(0,0,0,0.3);
-            border-radius: 6px;
-            font-size: 10px;
+            border-radius: 4px;
+            font-size: 9px;
             border-left: 2px solid rgba(255,255,255,0.05);
             align-items: center;
-            gap: 8px;
-            animation: slideIn 0.2s ease-out;
+            gap: 6px;
         }
-
-        .log-entry .time { color: var(--text-muted); font-family: 'Orbitron', monospace; font-size: 8px; white-space: nowrap; }
-        .log-entry .msg { flex: 1; color: var(--text); font-size: 10px; }
+        .log-entry .time { color: var(--text-muted); font-family: monospace; font-size: 7px; }
+        .log-entry .msg { flex: 1; }
         .log-entry.critical { border-left-color: var(--danger); }
         .log-entry.warning { border-left-color: var(--warning); }
         .log-entry.success { border-left-color: var(--success); }
         .log-entry.info { border-left-color: var(--primary); }
-        .log-entry.quantum { border-left-color: var(--secondary); }
 
         /* ===== TOAST ===== */
         .toast {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
+            bottom: 15px;
+            left: 15px;
+            right: 15px;
             background: rgba(17,24,39,0.95);
             border: 1px solid rgba(0,212,255,0.2);
-            border-radius: 12px;
-            padding: 14px 20px;
-            max-width: 400px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+            border-radius: 10px;
+            padding: 12px 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
             transform: translateY(120px);
             opacity: 0;
-            transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+            transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
             z-index: 1000;
-            backdrop-filter: blur(20px);
+            max-width: 400px;
+            margin: 0 auto;
         }
-
         .toast.show { transform: translateY(0); opacity: 1; }
-        .toast .title { font-weight: 700; font-size: 13px; font-family: 'Orbitron', monospace; }
+        .toast .title { font-weight: 700; font-size: 12px; }
         .toast .title.danger { color: var(--danger); }
         .toast .title.success { color: var(--success); }
         .toast .title.warning { color: var(--warning); }
-        .toast .title.info { color: var(--primary); }
-        .toast .title.quantum { color: var(--secondary); }
-        .toast .body { font-size: 11px; color: var(--text); margin-top: 3px; }
-        .toast .time { font-size: 9px; color: var(--text-muted); margin-top: 4px; font-family: 'Orbitron', monospace; }
+        .toast .body { font-size: 10px; color: var(--text); margin-top: 2px; }
+        .toast .time { font-size: 8px; color: var(--text-muted); margin-top: 3px; font-family: monospace; }
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
-            body { padding: 8px; }
-            .header { padding: 10px 14px; flex-direction: column; align-items: stretch; }
+            body { padding: 6px; }
+            .header { padding: 8px 14px; flex-direction: column; align-items: stretch; }
             .header-status { justify-content: space-between; }
-            .stats-grid { grid-template-columns: repeat(2, 1fr); }
-            .stat-value { font-size: 20px; }
-            .panel-body { padding: 10px 12px; max-height: 300px; }
+            .stats-grid { grid-template-columns: repeat(3, 1fr); }
+            .stat-value { font-size: 18px; }
+            .panel-body { padding: 8px 10px; max-height: 350px; }
             .device-item { flex-wrap: wrap; }
-            .topology-legend { bottom: 6px; right: 6px; font-size: 7px; padding: 3px 8px; flex-wrap: wrap; }
-            .toast { left: 15px; right: 15px; max-width: none; bottom: 15px; }
-            .logo-text h1 { font-size: 18px; }
             .ip-input-section .ip-row { flex-direction: column; align-items: stretch; }
+            .ip-input-section input[type="text"] { min-width: auto; }
+            .network-topology { min-height: 250px; }
+            .btn { padding: 4px 10px; font-size: 8px; }
+        }
+
+        @media (max-width: 400px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .stat-value { font-size: 16px; }
+            .logo-text h1 { font-size: 15px; }
         }
 
         .text-center { text-align: center; }
-        .text-muted { color: var(--text-muted); font-size: 11px; }
-        .mt-2 { margin-top: 10px; }
+        .text-muted { color: var(--text-muted); font-size: 10px; }
 
-        /* ===== FLASH OVERLAY ===== */
         .flash-overlay {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            pointer-events: none;
-            z-index: 999;
-            opacity: 0;
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            pointer-events: none; z-index: 999; opacity: 0;
             transition: opacity 0.15s;
         }
-
         .flash-overlay.danger {
             background: radial-gradient(ellipse at center, rgba(255,0,64,0.08), transparent 70%);
             border: 3px solid rgba(255,0,64,0.2);
             opacity: 1;
         }
-
         .flash-overlay.success {
             background: radial-gradient(ellipse at center, rgba(0,255,136,0.05), transparent 70%);
             border: 3px solid rgba(0,255,136,0.15);
             opacity: 1;
         }
 
-        .flash-overlay.quantum {
-            background: radial-gradient(ellipse at center, rgba(124,58,237,0.08), transparent 70%);
-            border: 3px solid rgba(124,58,237,0.2);
-            opacity: 1;
-        }
-
-        /* ===== BACKEND STATUS ===== */
-        .backend-status {
-            display: inline-block;
-            padding: 2px 10px;
-            border-radius: 10px;
-            font-size: 8px;
-            font-weight: 600;
-        }
         .backend-status.online { background: rgba(0,255,136,0.15); color: var(--success); }
         .backend-status.offline { background: rgba(255,0,64,0.15); color: var(--danger); }
 
-        /* ===== WELCOME SECTION ===== */
-        .welcome-section {
-            background: linear-gradient(135deg, rgba(17,24,39,0.95), rgba(30,58,95,0.5));
-            border: 1px solid rgba(0,212,255,0.1);
-            border-radius: 12px;
-            padding: 16px 20px;
-            margin-bottom: 16px;
-            text-align: center;
-        }
-
-        .welcome-section h2 {
-            font-size: 18px;
-            color: var(--primary);
-            margin-bottom: 6px;
-        }
-
-        .welcome-section p {
-            font-size: 12px;
-            color: var(--text-muted);
-            margin-bottom: 8px;
-        }
-
-        .welcome-section .features {
-            display: flex;
-            gap: 16px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .welcome-section .features span {
-            font-size: 10px;
-            padding: 4px 12px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 20px;
-            border: 1px solid rgba(255,255,255,0.05);
-        }
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); }
+        ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 3px; }
     </style>
 </head>
 <body>
 
-    <!-- ===== FLASH OVERLAY ===== -->
-    <div class="flash-overlay" id="flashOverlay"></div>
-
     <!-- ===== TOAST ===== -->
     <div class="toast" id="toast">
         <div class="title" id="toastTitle">🔒 Security Alert</div>
-        <div class="body" id="toastBody">Threat detected</div>
+        <div class="body" id="toastBody">Message</div>
         <div class="time" id="toastTime">Just now</div>
     </div>
+
+    <!-- ===== FLASH OVERLAY ===== -->
+    <div class="flash-overlay" id="flashOverlay"></div>
 
     <div class="dashboard">
 
@@ -602,7 +425,7 @@
                 <div class="logo-icon">🌐</div>
                 <div class="logo-text">
                     <h1>ECHOPLEX</h1>
-                    <span>🔴 Personal IP Scanner · Scan Specific IPs</span>
+                    <span>🔴 Any Device · Any Network</span>
                 </div>
             </div>
             <div class="header-status">
@@ -610,96 +433,67 @@
                     <span class="status-dot green" id="systemStatusDot"></span>
                     <span id="systemStatusText">Ready</span>
                 </div>
-                <div class="status-badge">📡 <span id="activeConnections">0</span> Devices</div>
-                <div class="status-badge">👤 <span id="userIdDisplay">Guest</span></div>
+                <div class="status-badge">📡 <span id="activeConnections">0</span></div>
                 <div class="status-badge">
-                    <span class="backend-status offline" id="backendStatus">● Backend Offline</span>
+                    <span class="backend-status offline" id="backendStatus">● Backend</span>
                 </div>
-                <div class="time-display" id="clockDisplay">--:--:--</div>
+                <div class="time-display" id="clockDisplay">--:--</div>
             </div>
         </header>
-
-        <!-- ===== WELCOME SECTION ===== -->
-        <div class="welcome-section">
-            <h2>🔍 Enter ANY IP Address to Scan</h2>
-            <p>Scan specific IPs: 192.168.1.1, 10.0.0.1, or any device on your network</p>
-            <div class="features">
-                <span>🔒 Specific IPs</span>
-                <span>🌐 Any Device</span>
-                <span>🧠 Quantum AI</span>
-                <span>🛡️ Real-Time</span>
-                <span>📊 Topology Map</span>
-            </div>
-        </div>
 
         <!-- ===== STATS ===== -->
         <section class="stats-grid">
             <div class="stat-card">
-                <div class="stat-label">Total Devices</div>
+                <div class="stat-label">Devices</div>
                 <div class="stat-value info" id="totalDevices">0</div>
-                <div class="stat-sub">📱 Scanned</div>
+                <div class="stat-sub">Found</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Online Devices</div>
+                <div class="stat-label">Online</div>
                 <div class="stat-value success" id="realDevices">0</div>
-                <div class="stat-sub">🌐 Active</div>
+                <div class="stat-sub">Active</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Threats Found</div>
+                <div class="stat-label">Threats</div>
                 <div class="stat-value danger" id="totalThreats">0</div>
-                <div class="stat-sub">⚠️ Detected</div>
+                <div class="stat-sub">Detected</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Quantum Status</div>
-                <div class="stat-value purple" id="quantumStatusValue">⏳</div>
-                <div class="stat-sub" id="quantumStatusText">Optional</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">AI Confidence</div>
-                <div class="stat-value purple" id="aiConfidence">99.8%</div>
-                <div class="stat-sub">🧠 Analysis</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Scan Status</div>
-                <div class="stat-value info" id="scanStatusValue">⏳</div>
-                <div class="stat-sub" id="scanStatusText">Ready</div>
+                <div class="stat-label">Health</div>
+                <div class="stat-value success" id="networkHealth">100%</div>
+                <div class="stat-sub">Network</div>
             </div>
         </section>
 
         <!-- ===== MAIN GRID ===== -->
-        <div style="display:grid;grid-template-columns:1.6fr 1fr;gap:16px;margin-bottom:16px;">
+        <div style="display:grid;grid-template-columns:1.6fr 1fr;gap:12px;">
 
             <!-- ===== NETWORK MAP ===== -->
             <div class="panel">
                 <div class="panel-header">
                     <div class="panel-title">
                         🌐 Network Topology
-                        <span class="badge personal">👤 YOUR SCAN</span>
-                        <span class="badge" id="scanStatusBadge">🟢 Ready</span>
+                        <span class="badge">LIVE</span>
                     </div>
                     <div class="panel-actions">
-                        <button class="btn btn-success" onclick="scanSpecificIP()">🔍 Scan IP</button>
-                        <button class="btn btn-primary" onclick="startDemoScan()">🎮 Demo</button>
-                        <button class="btn btn-warning" onclick="simulateThreat()">⚡ Test Threat</button>
+                        <button class="btn btn-success" onclick="scanNetwork()">🔍 Scan</button>
+                        <button class="btn btn-warning" onclick="simulateThreat()">⚡ Threat</button>
                     </div>
                 </div>
-                <div class="panel-body" style="padding:12px;">
-                    <!-- ===== IP INPUT SECTION ===== -->
+                <div class="panel-body" style="padding:8px;">
+                    <!-- ===== IP INPUT ===== -->
                     <div class="ip-input-section">
                         <div class="ip-row">
-                            <label>IP Address:</label>
+                            <label>IP to Scan:</label>
                             <input type="text" id="ipInput" placeholder="192.168.1.1" value="192.168.1.1">
-                            <button class="btn btn-success" onclick="scanSpecificIP()" style="font-size:10px;">🚀 Scan</button>
-                            <span class="scan-badge" id="ipBadge">📡 192.168.1.1</span>
+                            <button class="btn btn-primary" onclick="scanNetwork()" style="font-size:10px;">🚀 Go</button>
                         </div>
                         <div class="preset-ips">
-                            <span style="font-size:9px;color:var(--text-muted);margin-right:4px;">Quick:</span>
                             <button class="preset-btn" onclick="setIP('192.168.1.1')">🏠 Router</button>
                             <button class="preset-btn" onclick="setIP('192.168.1.100')">💻 PC</button>
                             <button class="preset-btn" onclick="setIP('192.168.1.101')">📱 Phone</button>
-                            <button class="preset-btn" onclick="setIP('192.168.1.102')">📺 Smart TV</button>
-                            <button class="preset-btn" onclick="setIP('10.0.0.1')">🌐 Office</button>
-                            <button class="preset-btn" onclick="setIP('127.0.0.1')">🔄 Localhost</button>
+                            <button class="preset-btn" onclick="setIP('127.0.0.1')">🔄 Local</button>
+                            <button class="preset-btn" onclick="setIP('')">🔄 Auto</button>
                         </div>
                     </div>
 
@@ -711,7 +505,6 @@
                             <span class="legend-item"><span class="legend-dot warning"></span> Warning</span>
                             <span class="legend-item"><span class="legend-dot danger"></span> Threat</span>
                             <span class="legend-item"><span class="legend-dot blocked"></span> Blocked</span>
-                            <span class="legend-item"><span class="legend-dot quantum"></span> Protected</span>
                         </div>
                     </div>
                 </div>
@@ -722,20 +515,17 @@
                 <div class="panel-header">
                     <div class="panel-title">
                         📱 Devices
-                        <span class="badge personal">👤 YOURS</span>
-                        <span class="badge" id="deviceCountBadge">0 found</span>
-                        <span class="badge" id="threatCountBadge" style="display:none;"></span>
+                        <span class="badge" id="deviceCountBadge">0</span>
                     </div>
                     <div class="panel-actions">
-                        <button class="btn btn-success" onclick="blockAllThreats()">🚫 Block All</button>
-                        <button class="btn btn-danger" onclick="emergencyLockdown()">🔒 Lockdown</button>
+                        <button class="btn btn-danger" onclick="blockAllThreats()">🚫 Block</button>
+                        <button class="btn btn-danger" onclick="emergencyLockdown()">🔒 Lock</button>
                     </div>
                 </div>
                 <div class="panel-body">
                     <div class="device-list" id="deviceList">
                         <div class="text-center text-muted" style="padding:30px 0;">
-                            🔍 Enter an IP address above and click Scan<br>
-                            <span style="font-size:10px;">Example: 192.168.1.1 scans your router</span>
+                            🔍 Enter IP and click Scan
                         </div>
                     </div>
                 </div>
@@ -743,103 +533,67 @@
         </div>
 
         <!-- ===== BOTTOM ROW ===== -->
-        <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:16px;">
+        <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:12px;margin-top:12px;">
 
             <!-- ===== AI THOUGHTS ===== -->
             <div class="panel">
                 <div class="panel-header">
-                    <div class="panel-title">
-                        🧠 AI Analysis
-                        <span class="badge quantum">🧠 Quantum</span>
-                    </div>
+                    <div class="panel-title">🧠 AI Analysis</div>
                     <div class="panel-actions">
                         <button class="btn" onclick="clearAIThoughts()">Clear</button>
-                        <button class="btn btn-quantum" onclick="runQuantumAnalysis()">🧠 Quantum AI</button>
+                        <button class="btn btn-purple" onclick="runQuantumAI()">🧠 Quantum</button>
                     </div>
                 </div>
-                <div class="panel-body" style="padding:12px;">
+                <div class="panel-body" style="padding:8px;">
                     <div class="ai-thoughts" id="aiThoughts">
                         <div class="thought">
-                            <span class="thought-timestamp">[INIT]</span> ⚡ ECHOPLEX IP Scanner Ready<br>
-                            <span class="thought-timestamp">[INIT]</span> 🔍 Enter any IP to scan<br>
-                            <span class="thought-timestamp">[INIT]</span> 🌐 Examples: 192.168.1.1, 10.0.0.1
+                            <span class="thought-timestamp">[INIT]</span> ⚡ ECHOPLEX Ready<br>
+                            <span class="thought-timestamp">[INIT]</span> 🔍 Enter any IP to scan
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- ===== CONFIG & LOG ===== -->
+            <!-- ===== SETTINGS & LOG ===== -->
             <div class="panel">
                 <div class="panel-header">
                     <div class="panel-title">
-                        ⚙️ Settings & Log
-                        <span class="badge personal">👤 PERSONAL</span>
-                        <span class="badge" id="logCountBadge">0 events</span>
+                        ⚙️ Settings
+                        <span class="badge" id="logCountBadge">0</span>
                     </div>
                     <div class="panel-actions">
                         <button class="btn" onclick="clearLog()">Clear</button>
-                        <button class="btn btn-primary" onclick="exportLog()">📤 Export</button>
+                        <button class="btn btn-primary" onclick="exportLog()">📤</button>
                     </div>
                 </div>
-                <div class="panel-body">
-                    <div class="config-section">
-                        <div style="font-size:11px;color:var(--text-muted);margin-bottom:10px;font-weight:600;">🔐 Your Settings</div>
-                        
-                        <div class="config-row">
-                            <label>Your Name:</label>
-                            <input type="text" id="userName" placeholder="Enter your name" value="Guest">
-                            <button class="btn btn-success" onclick="updateUserName()" style="font-size:9px;">Set</button>
-                        </div>
-
-                        <div class="config-row">
-                            <label>Quantum API:</label>
-                            <input type="password" id="quantumApiKey" placeholder="Your IBM Quantum API key (optional)" value="">
-                            <button class="btn btn-quantum" onclick="connectQuantumAPI()" style="font-size:9px;">Connect</button>
-                            <span class="api-status inactive" id="quantumApiStatus">● Disconnected</span>
-                        </div>
-                        
-                        <div class="config-row">
-                            <label>Backend URL:</label>
-                            <input type="text" id="backendUrl" value="https://echoplex-net-solutions.onrender.com">
-                            <button class="btn btn-primary" onclick="checkBackendStatus()" style="font-size:9px;">Check</button>
-                            <span class="api-status inactive" id="backendApiStatus">● Disconnected</span>
-                        </div>
-                        
-                        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;">
-                            <button class="btn btn-danger" onclick="clearMyData()" style="font-size:9px;">🗑 Clear</button>
-                            <button class="btn btn-purple" onclick="exportMyReport()" style="font-size:9px;">📊 Report</button>
-                            <button class="btn btn-quantum" onclick="applyQuantumProtection()" style="font-size:9px;">🛡️ Shield</button>
+                <div class="panel-body" style="padding:8px;">
+                    <div class="config-section" style="background:rgba(0,0,0,0.3);border-radius:8px;padding:10px;border:1px solid rgba(255,255,255,0.05);margin-bottom:8px;">
+                        <div style="font-size:10px;color:var(--text-muted);margin-bottom:6px;">🔐 Backend</div>
+                        <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+                            <input type="text" id="backendUrl" value="https://echoplex-net-solutions.onrender.com" style="flex:1;padding:4px 8px;background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.1);border-radius:4px;color:var(--text);font-size:9px;min-width:100px;">
+                            <button class="btn btn-primary" onclick="checkBackend()" style="font-size:8px;">Check</button>
                         </div>
                     </div>
-                    
-                    <div style="margin-top:10px;">
-                        <div class="alert-log" id="alertLog">
-                            <div class="text-center text-muted" style="padding:10px 0;" id="emptyLogState">
-                                No events logged
-                            </div>
-                        </div>
+                    <div class="alert-log" id="alertLog">
+                        <div class="text-center text-muted" style="padding:10px 0;">No events</div>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- ===== FOOTER ===== -->
-        <div style="margin-top:14px;padding:10px 20px;background:rgba(17,24,39,0.9);border-radius:12px;border:1px solid rgba(255,255,255,0.05);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font-size:9px;color:var(--text-muted);">
-            <span>⚡ ECHOPLEX v5.0 · 👤 Personal IP Scanner · Scan Specific IPs · Your data stays yours</span>
-            <span id="footerTimestamp">Last update: --</span>
+        <div style="margin-top:12px;padding:8px 14px;background:rgba(17,24,39,0.9);border-radius:10px;border:1px solid rgba(255,255,255,0.05);display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;font-size:8px;color:var(--text-muted);">
+            <span>⚡ ECHOPLEX v5.0 · Works on ANY Device</span>
+            <span id="footerTimestamp">--</span>
         </div>
     </div>
 
     <script>
         // ============================================================
-        //  👤 PERSONAL IP SCANNER - SCAN SPECIFIC IPS
-        //  YOUR DATA STAYS ON YOUR DEVICE
+        //  CONFIGURATION
         // ============================================================
-        
         const CONFIG = {
-            quantumApiKey: '',
             backendUrl: 'https://echoplex-net-solutions.onrender.com',
-            userId: 'Guest_' + Math.random().toString(36).substr(2, 6),
             defaultIP: '192.168.1.1'
         };
 
@@ -854,18 +608,9 @@
             deviceIdCounter: 0,
             isScanning: false,
             isLockdown: false,
-            toastTimer: null,
             networkHealth: 100,
-            aiConfidence: 99.8,
-            startTime: Date.now(),
             backendOnline: false,
-            quantumConnected: false,
-            quantumApiKey: CONFIG.quantumApiKey,
-            realDeviceCount: 0,
-            userName: 'Guest',
-            sessionId: CONFIG.userId,
-            currentIP: CONFIG.defaultIP,
-            scanCount: 0
+            currentIP: CONFIG.defaultIP
         };
 
         // ============================================================
@@ -881,25 +626,13 @@
         const totalDevices = $('totalDevices');
         const realDevices = $('realDevices');
         const totalThreats = $('totalThreats');
-        const aiConfidence = $('aiConfidence');
         const networkHealth = $('networkHealth');
-        const quantumStatusValue = $('quantumStatusValue');
-        const quantumStatusText = $('quantumStatusText');
-        const scanStatusValue = $('scanStatusValue');
-        const scanStatusText = $('scanStatusText');
         const deviceCountBadge = $('deviceCountBadge');
-        const threatCountBadge = $('threatCountBadge');
         const logCountBadge = $('logCountBadge');
         const systemStatusDot = $('systemStatusDot');
         const systemStatusText = $('systemStatusText');
         const activeConnections = $('activeConnections');
-        const aiStatus = $('aiStatus');
-        const scanStatusBadge = $('scanStatusBadge');
         const backendStatus = $('backendStatus');
-        const backendApiStatus = $('backendApiStatus');
-        const quantumApiStatus = $('quantumApiStatus');
-        const ipBadge = $('ipBadge');
-        const userIdDisplay = $('userIdDisplay');
         const flashOverlay = $('flashOverlay');
         const toast = $('toast');
         const toastTitle = $('toastTitle');
@@ -907,395 +640,141 @@
         const toastTime = $('toastTime');
         const footerTimestamp = $('footerTimestamp');
         const backendUrlInput = $('backendUrl');
-        const quantumApiKeyInput = $('quantumApiKey');
-        const userNameInput = $('userName');
         const ipInput = $('ipInput');
 
         // ============================================================
-        //  USER FUNCTIONS
-        // ============================================================
-        function updateUserName() {
-            const name = userNameInput.value.trim() || 'Guest';
-            state.userName = name;
-            userIdDisplay.textContent = name;
-            addAIThought(`👤 Welcome ${name}!`);
-            showToast('👤 Name Updated', `Hello ${name}!`);
-        }
-
-        // ============================================================
-        //  IP FUNCTIONS
+        //  FUNCTIONS
         // ============================================================
         function setIP(ip) {
             ipInput.value = ip;
-            ipBadge.textContent = `📡 ${ip}`;
-            state.currentIP = ip;
-            addAIThought(`📡 IP set to: ${ip}`);
+            state.currentIP = ip || CONFIG.defaultIP;
+            addAIThought(`📡 IP set to: ${state.currentIP}`);
         }
 
-        function updateIP() {
-            const ip = ipInput.value.trim() || CONFIG.defaultIP;
-            state.currentIP = ip;
-            ipBadge.textContent = `📡 ${ip}`;
-            addAIThought(`📡 IP updated to: ${ip}`);
-        }
-
-        // ============================================================
-        //  QUANTUM API (OPTIONAL)
-        // ============================================================
-        function connectQuantumAPI() {
-            const key = quantumApiKeyInput.value.trim();
-            if (!key) {
-                showToast('ℹ️ Optional', 'Quantum API is optional.');
-                return;
-            }
-            
-            state.quantumApiKey = key;
-            addAIThought('🔐 Connecting to YOUR IBM Quantum API...');
-            
-            if (key.length < 10) {
-                quantumApiStatus.className = 'api-status inactive';
-                quantumApiStatus.textContent = '● Invalid Key';
-                quantumStatusValue.textContent = '❌';
-                quantumStatusText.textContent = 'Invalid Key';
-                showToast('❌ Invalid Key', 'Please check your API key');
-                return;
-            }
-            
-            setTimeout(() => {
-                state.quantumConnected = true;
-                quantumApiStatus.className = 'api-status quantum';
-                quantumApiStatus.textContent = '● Connected';
-                quantumStatusValue.textContent = '✅';
-                quantumStatusText.textContent = 'Quantum Ready';
-                showToast('✅ Quantum Connected', 'Your IBM Quantum API is active');
-                addAIThought('✅ Your Quantum API connected successfully');
-                addLogEntry('🧠 Quantum API connected', 'quantum');
-                updateStats();
-            }, 1500);
-        }
-
-        function applyQuantumProtection() {
-            if (!state.quantumConnected) {
-                showToast('ℹ️ Optional', 'Connect Quantum API for protection');
-                return;
-            }
-            
-            addAIThought(`🛡️ Applying Quantum Protection...`);
-            state.devices.forEach(device => {
-                if (device.status !== 'blocked') {
-                    device.quantumProtected = true;
-                    if (device.status === 'danger' && Math.random() < 0.7) {
-                        device.status = 'safe';
-                        device.threat = null;
-                        addLogEntry(`🧠 Quantum AI healed ${device.name}`, 'quantum');
-                    }
-                }
-            });
-            addAIThought('✅ Quantum Protection applied');
-            showToast('🛡️ Quantum Shield Active', 'Devices are quantum protected');
-            updateDeviceList();
-            updateStats();
-            drawTopology();
-        }
-
-        // ============================================================
-        //  BACKEND FUNCTIONS
-        // ============================================================
-        async function checkBackendStatus() {
+        function checkBackend() {
             const url = backendUrlInput.value.trim() || CONFIG.backendUrl;
             CONFIG.backendUrl = url;
+            addAIThought(`🔍 Checking backend...`);
             
-            addAIThought(`🔍 Checking backend: ${url}`);
-            
-            try {
-                const response = await fetch(`${url}/api/status`, {
-                    method: 'GET',
-                    headers: { 'Content-Type': 'application/json' }
-                });
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    state.backendOnline = true;
-                    backendStatus.className = 'backend-status online';
-                    backendStatus.textContent = '● Backend Online';
-                    backendApiStatus.className = 'api-status active';
-                    backendApiStatus.textContent = '● Connected';
-                    addAIThought(`✅ Backend online`);
-                    showToast('✅ Backend Connected', 'Ready to scan');
-                } else {
+            fetch(`${url}/api/status`)
+                .then(res => {
+                    if (res.ok) {
+                        state.backendOnline = true;
+                        backendStatus.className = 'backend-status online';
+                        backendStatus.textContent = '● Online';
+                        addAIThought('✅ Backend online');
+                        showToast('✅ Backend Connected', 'Ready to scan');
+                    } else {
+                        throw new Error('Not responding');
+                    }
+                })
+                .catch(() => {
                     state.backendOnline = false;
                     backendStatus.className = 'backend-status offline';
-                    backendStatus.textContent = '● Backend Offline';
-                    backendApiStatus.className = 'api-status inactive';
-                    backendApiStatus.textContent = '● Disconnected';
-                    addAIThought('❌ Backend not responding');
-                }
-            } catch (error) {
-                state.backendOnline = false;
-                backendStatus.className = 'backend-status offline';
-                backendStatus.textContent = '● Backend Offline';
-                backendApiStatus.className = 'api-status inactive';
-                backendApiStatus.textContent = '● Disconnected';
-                addAIThought('❌ Cannot connect to backend');
-            }
+                    backendStatus.textContent = '● Offline';
+                    addAIThought('❌ Backend offline');
+                    showToast('❌ Backend Offline', 'Check your connection');
+                });
         }
 
-        // ============================================================
-        //  SCAN SPECIFIC IP
-        // ============================================================
-        async function scanSpecificIP() {
+        function scanNetwork() {
             if (state.isScanning) {
-                showToast('⏳ Scan Running', 'Please wait');
+                showToast('⏳ Scanning...', 'Please wait');
                 return;
             }
 
-            // Get IP from input
             let ip = ipInput.value.trim();
             if (!ip) {
                 ip = CONFIG.defaultIP;
                 ipInput.value = ip;
             }
-            
-            // Validate IP format
+
+            // Validate IP
             const ipPattern = /^(\d{1,3}\.){3}\d{1,3}$/;
             if (!ipPattern.test(ip)) {
-                showToast('❌ Invalid IP', 'Please enter a valid IP address (e.g., 192.168.1.1)');
+                showToast('❌ Invalid IP', 'Enter a valid IP address');
                 return;
             }
 
             state.currentIP = ip;
-            ipBadge.textContent = `📡 ${ip}`;
-            state.scanCount++;
 
             if (!state.backendOnline) {
-                await checkBackendStatus();
-                if (!state.backendOnline) {
-                    showToast('❌ Backend Offline', 'Check your connection');
-                    return;
-                }
-            }
-
-            state.isScanning = true;
-            scanStatusBadge.textContent = '🔵 Scanning...';
-            scanStatusBadge.style.color = 'var(--primary)';
-            scanStatusValue.textContent = '🔄';
-            scanStatusText.textContent = 'Scanning...';
-            
-            addAIThought(`🌐 Scanning IP: ${ip}`);
-            addLogEntry(`🌐 Scanning IP: ${ip}`, 'info');
-
-            try {
-                // Use the backend to scan the specific IP
-                const url = `${CONFIG.backendUrl}/api/scan-ip?ip=${encodeURIComponent(ip)}`;
-                const response = await fetch(url, {
-                    method: 'GET',
-                    headers: { 'Content-Type': 'application/json' }
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
-                }
-
-                const data = await response.json();
-                const device = data.device || data;
-                
-                if (!device || device.error) {
-                    addAIThought(`⚠️ No device found at ${ip}`);
-                    showToast('⚠️ No Device', `No active device found at ${ip}`);
-                    state.isScanning = false;
-                    scanStatusBadge.textContent = '🟢 Ready';
-                    scanStatusBadge.style.color = 'var(--primary)';
-                    scanStatusValue.textContent = '⏳';
-                    scanStatusText.textContent = 'No device';
-                    return;
-                }
-
-                // Check if device already exists
-                const exists = state.devices.some(d => d.ip === device.ip);
-                if (!exists) {
-                    const newDevice = {
-                        id: ++state.deviceIdCounter,
-                        name: device.hostname || device.ip,
-                        type: device.type || '💻 Device',
-                        ip: device.ip,
-                        mac: device.mac || 'Unknown',
-                        os: device.os || 'Unknown',
-                        status: 'safe',
-                        threat: null,
-                        isReal: true,
-                        isMyDevice: false,
-                        quantumProtected: state.quantumConnected,
-                        lastSeen: new Date().toISOString(),
-                        traffic: Math.floor(Math.random() * 100) + 10
-                    };
-                    state.devices.push(newDevice);
-                    state.realDeviceCount++;
-                    
-                    // Simulate threat detection (10% chance)
-                    if (Math.random() < 0.1) {
-                        const threats = [
-                            'Open Ports Detected',
-                            'Suspicious Activity',
-                            'Unsecured Service',
-                            'Potential Vulnerability'
-                        ];
-                        newDevice.status = 'warning';
-                        newDevice.threat = threats[Math.floor(Math.random() * threats.length)];
-                        state.totalDetected++;
-                        addLogEntry(`⚠️ ${newDevice.threat} on ${newDevice.name}`, 'warning');
-                    }
-                    
-                    addAIThought(`✅ Found device: ${newDevice.name} at ${ip}`);
-                    addLogEntry(`✅ Found ${newDevice.name} at ${ip}`, 'success');
-                    showToast(`✅ Device Found`, `${newDevice.name} at ${ip}`);
-
-                    if (state.quantumConnected) {
-                        applyQuantumProtection();
-                    }
-
-                } else {
-                    // Update existing device
-                    const existing = state.devices.find(d => d.ip === device.ip);
-                    if (existing) {
-                        existing.lastSeen = new Date().toISOString();
-                        existing.name = device.hostname || existing.name;
-                        addAIThought(`✅ Updated device: ${existing.name} at ${ip}`);
-                        showToast('✅ Device Updated', `${existing.name} refreshed`);
-                    }
-                }
-
-                updateDeviceList();
-                updateStats();
-                drawTopology();
-                flashOverlay.className = 'flash-overlay success';
-                setTimeout(() => flashOverlay.className = 'flash-overlay', 500);
-
-            } catch (error) {
-                addAIThought(`❌ Error scanning ${ip}: ${error.message}`);
-                showToast('❌ Scan Failed', error.message);
-                addLogEntry(`❌ Scan error: ${error.message}`, 'critical');
-            }
-
-            state.isScanning = false;
-            scanStatusBadge.textContent = '🟢 Ready';
-            scanStatusBadge.style.color = 'var(--primary)';
-            scanStatusValue.textContent = '✅';
-            scanStatusText.textContent = 'Complete';
-        }
-
-        // ============================================================
-        //  DEMO SCAN
-        // ============================================================
-        function startDemoScan() {
-            if (state.isScanning) return;
-            state.isScanning = true;
-            scanStatusBadge.textContent = '🔵 Demo...';
-            scanStatusValue.textContent = '🔄';
-            scanStatusText.textContent = 'Demo';
-            
-            addAIThought(`🔍 Running demo scan...`);
-            const ip = ipInput.value.trim() || '192.168.1.1';
-            
-            const device = {
-                id: ++state.deviceIdCounter,
-                name: 'Demo Device',
-                type: '💻 Workstation',
-                ip: ip,
-                mac: 'AA:BB:CC:DD:EE:FF',
-                os: 'Windows 11',
-                status: 'safe',
-                threat: null,
-                isReal: false,
-                isMyDevice: false,
-                quantumProtected: state.quantumConnected,
-                lastSeen: new Date().toISOString(),
-                traffic: 45
-            };
-            
-            if (Math.random() < 0.2) {
-                const threats = ['Open Ports Detected', 'Suspicious Activity', 'Unsecured Service'];
-                device.status = 'warning';
-                device.threat = threats[Math.floor(Math.random() * threats.length)];
-                state.totalDetected++;
-                addLogEntry(`⚠️ ${device.threat} on ${device.name}`, 'warning');
-            }
-            
-            state.devices.push(device);
-            state.realDeviceCount++;
-            
-            addAIThought(`✅ Demo scan complete: ${device.name} added`);
-            updateDeviceList();
-            updateStats();
-            drawTopology();
-            
-            state.isScanning = false;
-            scanStatusBadge.textContent = '🟢 Ready';
-            scanStatusValue.textContent = '✅';
-            scanStatusText.textContent = 'Demo Complete';
-            showToast('✅ Demo Complete', `Added ${device.name}`);
-        }
-
-        // ============================================================
-        //  QUANTUM ANALYSIS
-        // ============================================================
-        function runQuantumAnalysis() {
-            if (!state.quantumConnected) {
-                showToast('ℹ️ Optional', 'Connect Quantum API for analysis');
-                addAIThought('ℹ️ Quantum API is optional.');
+                checkBackend();
                 return;
             }
+
+            state.isScanning = true;
+            addAIThought(`🌐 Scanning: ${ip}`);
+            addLogEntry(`🌐 Scanning ${ip}`, 'info');
+
+            // Try the correct endpoint
+            const url = `${CONFIG.backendUrl}/api/scan-ip?ip=${encodeURIComponent(ip)}`;
             
-            addAIThought(`🧠 Running Quantum Analysis...`);
-            addLogEntry(`🧠 Quantum analysis started`, 'quantum');
-
-            const analysisSteps = [
-                'Analyzing device patterns',
-                'Processing threats',
-                'Evaluating risk scores',
-                'Predicting attacks',
-                'Verifying security',
-                'Detecting anomalies',
-                'Generating recommendations'
-            ];
-
-            let step = 0;
-            const quantumInterval = setInterval(() => {
-                if (step >= analysisSteps.length) {
-                    clearInterval(quantumInterval);
+            fetch(url)
+                .then(res => {
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    return res.json();
+                })
+                .then(data => {
+                    const device = data.device || data;
                     
-                    const threats = state.devices.filter(d => d.status === 'danger').length;
-                    const warnings = state.devices.filter(d => d.status === 'warning').length;
-                    const secure = state.devices.filter(d => d.status === 'safe').length;
-                    
-                    addAIThought(`📊 Quantum Analysis Complete!`);
-                    addAIThought(`📈 ${secure} secure, ${warnings} warnings, ${threats} threats`);
-                    addAIThought(`🎯 AI Confidence: ${state.aiConfidence}%`);
-                    
-                    if (threats > 0) {
-                        addAIThought(`⚡ Quantum auto-heal initiated`);
-                        const criticalThreats = state.devices.filter(d => d.status === 'danger');
-                        criticalThreats.forEach(d => {
-                            if (Math.random() < 0.6) {
-                                d.status = 'safe';
-                                d.threat = null;
-                                d.quantumProtected = true;
-                                addLogEntry(`🧠 Quantum AI healed ${d.name}`, 'quantum');
-                            }
-                        });
-                        updateDeviceList();
-                        updateStats();
-                        drawTopology();
+                    if (device && device.error) {
+                        addAIThought(`⚠️ ${device.error}`);
+                        showToast('⚠️ No Device', device.error);
+                        state.isScanning = false;
+                        return;
                     }
-                    
-                    showToast('🧠 Analysis Complete', `Analyzed ${state.devices.length} devices`);
-                    return;
-                }
 
-                addAIThought(`🧠 ${analysisSteps[step]}... (${Math.round((step+1)/analysisSteps.length*100)}%)`);
-                state.aiConfidence = Math.min(99.99, state.aiConfidence + 0.02);
-                aiConfidence.textContent = state.aiConfidence.toFixed(1) + '%';
-                step++;
-            }, 800);
+                    if (!device || !device.ip) {
+                        addAIThought(`⚠️ No device at ${ip}`);
+                        showToast('⚠️ No Device', `No device found at ${ip}`);
+                        state.isScanning = false;
+                        return;
+                    }
+
+                    // Add device
+                    const exists = state.devices.some(d => d.ip === device.ip);
+                    if (!exists) {
+                        const newDevice = {
+                            id: ++state.deviceIdCounter,
+                            name: device.hostname || device.ip,
+                            type: device.type || '💻 Device',
+                            ip: device.ip,
+                            mac: device.mac || 'Unknown',
+                            status: 'safe',
+                            threat: null,
+                            isReal: true,
+                            lastSeen: new Date().toISOString()
+                        };
+                        state.devices.push(newDevice);
+                        addAIThought(`✅ Found: ${newDevice.name} (${newDevice.ip})`);
+                        addLogEntry(`✅ Found ${newDevice.name} at ${newDevice.ip}`, 'success');
+                        showToast('✅ Device Found', `${newDevice.name}`);
+                    } else {
+                        const existing = state.devices.find(d => d.ip === device.ip);
+                        if (existing) {
+                            existing.lastSeen = new Date().toISOString();
+                            existing.name = device.hostname || existing.name;
+                            addAIThought(`✅ Updated: ${existing.name}`);
+                            showToast('✅ Updated', `${existing.name} refreshed`);
+                        }
+                    }
+
+                    updateDeviceList();
+                    updateStats();
+                    drawTopology();
+                    flashOverlay.className = 'flash-overlay success';
+                    setTimeout(() => flashOverlay.className = 'flash-overlay', 500);
+
+                })
+                .catch(err => {
+                    addAIThought(`❌ Error: ${err.message}`);
+                    showToast('❌ Scan Failed', err.message);
+                    addLogEntry(`❌ Scan error: ${err.message}`, 'critical');
+                })
+                .finally(() => {
+                    state.isScanning = false;
+                });
         }
 
         // ============================================================
@@ -1305,12 +784,12 @@
             const device = state.devices.find(d => d.id === id);
             if (device && device.status !== 'blocked') {
                 device.status = 'blocked';
-                addLogEntry(`🚫 Blocked ${device.name} (${device.ip})`, 'critical');
+                addLogEntry(`🚫 Blocked ${device.name}`, 'critical');
                 addAIThought(`🚫 Blocked ${device.name}`);
                 updateDeviceList();
                 updateStats();
                 drawTopology();
-                showToast('🚫 Device Blocked', device.name);
+                showToast('🚫 Blocked', device.name);
             }
         }
 
@@ -1319,15 +798,12 @@
             if (device) {
                 device.status = 'safe';
                 device.threat = null;
-                if (state.quantumConnected) {
-                    device.quantumProtected = true;
-                }
                 addLogEntry(`✅ Unblocked ${device.name}`, 'success');
                 addAIThought(`✅ ${device.name} restored`);
                 updateDeviceList();
                 updateStats();
                 drawTopology();
-                showToast('✅ Device Unblocked', device.name);
+                showToast('✅ Unblocked', device.name);
             }
         }
 
@@ -1336,15 +812,12 @@
             if (device) {
                 device.status = 'safe';
                 device.threat = null;
-                if (state.quantumConnected) {
-                    device.quantumProtected = true;
-                }
-                addLogEntry(`✅ Resolved threat on ${device.name}`, 'success');
-                addAIThought(`✅ Threat resolved on ${device.name}`);
+                addLogEntry(`✅ Resolved ${device.name}`, 'success');
+                addAIThought(`✅ ${device.name} resolved`);
                 updateDeviceList();
                 updateStats();
                 drawTopology();
-                showToast('✅ Threat Resolved', device.name);
+                showToast('✅ Resolved', device.name);
             }
         }
 
@@ -1355,24 +828,23 @@
                 return;
             }
             threats.forEach(d => { d.status = 'blocked'; });
-            addLogEntry(`🚫 Blocked ${threats.length} threat devices`, 'critical');
+            addLogEntry(`🚫 Blocked ${threats.length} devices`, 'critical');
             addAIThought(`🚫 Blocked ${threats.length} devices`);
             updateDeviceList();
             updateStats();
             drawTopology();
-            showToast('🚫 Threats Blocked', `${threats.length} devices isolated`);
+            showToast('🚫 Threats Blocked', `${threats.length} devices`);
         }
 
         function emergencyLockdown() {
             if (state.isLockdown) {
-                showToast('⛔ Already Locked', 'System is in lockdown');
+                showToast('⛔ Locked', 'Already in lockdown');
                 return;
             }
             state.isLockdown = true;
             state.devices.forEach(d => { if (d.status !== 'blocked') d.status = 'blocked'; });
             systemStatusDot.className = 'status-dot red';
             systemStatusText.textContent = '🔒 LOCKDOWN';
-            systemStatusText.style.color = 'var(--danger)';
             addLogEntry('🔒 EMERGENCY LOCKDOWN', 'critical');
             addAIThought('🔒 LOCKDOWN ACTIVATED');
             updateDeviceList();
@@ -1384,24 +856,16 @@
             
             setTimeout(() => {
                 state.isLockdown = false;
-                state.devices.forEach(d => { 
-                    if (d.status === 'blocked' && !d.threat) {
-                        d.status = 'safe';
-                        if (state.quantumConnected) {
-                            d.quantumProtected = true;
-                        }
-                    }
-                });
+                state.devices.forEach(d => { if (d.status === 'blocked' && !d.threat) d.status = 'safe'; });
                 systemStatusDot.className = 'status-dot green';
-                systemStatusText.textContent = 'All Systems Secure';
-                systemStatusText.style.color = 'var(--text)';
+                systemStatusText.textContent = 'Ready';
                 addLogEntry('✅ Lockdown lifted', 'success');
                 addAIThought('✅ Lockdown lifted');
                 updateDeviceList();
                 updateStats();
                 drawTopology();
                 showToast('✅ Lockdown Lifted', 'Network restored');
-            }, 30000);
+            }, 15000);
         }
 
         function simulateThreat() {
@@ -1411,7 +875,7 @@
                 return;
             }
             const device = safe[Math.floor(Math.random() * safe.length)];
-            const threats = ['Open Ports Detected', 'Suspicious Activity', 'Unsecured Service', 'Potential Vulnerability'];
+            const threats = ['Open Ports', 'Suspicious Activity', 'Unsecured Service', 'Potential Vulnerability'];
             const threat = threats[Math.floor(Math.random() * threats.length)];
             device.status = 'warning';
             device.threat = threat;
@@ -1420,50 +884,40 @@
             addAIThought(`🔥 ${threat} detected on ${device.name}`);
             flashOverlay.className = 'flash-overlay danger';
             setTimeout(() => flashOverlay.className = 'flash-overlay', 400);
-            
-            if (state.quantumConnected && Math.random() < 0.5) {
-                setTimeout(() => {
-                    if (device.status === 'warning') {
-                        device.status = 'safe';
-                        device.threat = null;
-                        device.quantumProtected = true;
-                        addLogEntry(`🧠 Quantum AI healed ${device.name}`, 'quantum');
-                        addAIThought(`✅ Quantum AI neutralized threat on ${device.name}`);
-                        updateDeviceList();
-                        updateStats();
-                        drawTopology();
-                        showToast('🧠 Quantum Healed', `Threat on ${device.name} neutralized`);
-                    }
-                }, 2000);
-            }
-            
             updateDeviceList();
             updateStats();
             drawTopology();
             showToast('⚠️ Threat Detected', `${threat} on ${device.name}`);
         }
 
+        function runQuantumAI() {
+            addAIThought('🧠 Quantum AI analyzing...');
+            addAIThought('📊 Analyzing network patterns...');
+            setTimeout(() => {
+                const threats = state.devices.filter(d => d.status === 'danger' || d.status === 'warning').length;
+                addAIThought(`📈 ${state.devices.length} devices analyzed`);
+                if (threats > 0) {
+                    addAIThought(`⚠️ ${threats} potential threats found`);
+                    addAIThought('⚡ AI recommendations: Review suspicious devices');
+                } else {
+                    addAIThought('✅ Network appears secure');
+                }
+                showToast('🧠 AI Complete', `Analyzed ${state.devices.length} devices`);
+            }, 2000);
+        }
+
         // ============================================================
-        //  UI UPDATE FUNCTIONS
+        //  UPDATE UI
         // ============================================================
         function updateDeviceList() {
             const active = state.devices.filter(d => d.status !== 'blocked');
-            const threats = state.devices.filter(d => d.status === 'danger' || d.status === 'warning');
-            
-            deviceCountBadge.textContent = `${active.length} online`;
-            if (threats.length > 0) {
-                threatCountBadge.textContent = `⚠️ ${threats.length} threats`;
-                threatCountBadge.style.display = 'inline-block';
-                threatCountBadge.className = 'badge danger';
-            } else {
-                threatCountBadge.style.display = 'none';
-            }
+            deviceCountBadge.textContent = active.length;
 
             if (state.devices.length === 0) {
                 deviceList.innerHTML = `
-                    <div class="text-center text-muted" style="padding:30px 0;">
-                        🔍 No devices found<br>
-                        <span style="font-size:10px;">Enter an IP address and click "Scan"</span>
+                    <div class="text-center text-muted" style="padding:20px 0;">
+                        🔍 No devices<br>
+                        <span style="font-size:8px;">Enter IP and click Scan</span>
                     </div>
                 `;
                 return;
@@ -1471,38 +925,19 @@
 
             let html = '';
             state.devices.forEach(device => {
-                const statusClass = device.quantumProtected ? 'quantum-protected' : 
-                                   device.isMyDevice ? 'your-device' : device.status;
-                const iconMap = { 
-                    safe: '🟢', 
-                    warning: '🟡', 
-                    danger: '🔴', 
-                    blocked: '🚫', 
-                    'quantum-protected': '🧠',
-                    'your-device': '👤'
-                };
-                const statusTextMap = { 
-                    safe: 'Secure', 
-                    warning: '⚠️ Suspicious', 
-                    danger: '🔥 Threat', 
-                    blocked: '⛔ Blocked', 
-                    'quantum-protected': '🧠 Quantum Shield',
-                    'your-device': '👤 YOUR Device'
-                };
-                const realTag = device.isReal ? '<span class="real-tag">🌐 REAL</span>' : '';
-                const quantumTag = device.quantumProtected ? '<span class="quantum-tag">🧠 Quantum</span>' : '';
-                const yourTag = device.isMyDevice ? '<span class="your-tag">👤 YOURS</span>' : '';
+                const statusClass = device.status;
+                const iconMap = { safe: '🟢', warning: '🟡', danger: '🔴', blocked: '🚫' };
+                const statusTextMap = { safe: 'Secure', warning: '⚠️', danger: '🔥', blocked: '⛔' };
 
                 html += `
                     <div class="device-item ${statusClass}">
                         <div class="device-icon ${statusClass}">${iconMap[statusClass]}</div>
                         <div class="device-info">
-                            <div class="name">${device.name} ${realTag} ${quantumTag} ${yourTag}</div>
-                            <div class="ip">${device.ip} · ${device.mac}</div>
+                            <div class="name">${device.name}</div>
+                            <div class="ip">${device.ip}</div>
                             <div class="status-text">
-                                <span>${statusTextMap[statusClass]}</span>
+                                ${statusTextMap[statusClass]}
                                 ${device.threat ? `<span class="threat-tag">${device.threat}</span>` : ''}
-                                <span>📊 ${device.traffic} MB/s</span>
                             </div>
                         </div>
                         <div class="device-actions">
@@ -1514,113 +949,67 @@
                             ${device.status === 'danger' || device.status === 'warning' ? `
                                 <button class="btn btn-success" onclick="resolveDevice(${device.id})">Resolve</button>
                             ` : ''}
-                            ${!device.quantumProtected && state.quantumConnected && device.status !== 'blocked' ? `
-                                <button class="btn btn-quantum" onclick="protectDeviceQuantum(${device.id})">🧠 Shield</button>
-                            ` : ''}
                         </div>
                     </div>
                 `;
             });
 
             deviceList.innerHTML = html;
-            updateStats();
-        }
-
-        function protectDeviceQuantum(id) {
-            if (!state.quantumConnected) {
-                showToast('ℹ️ Optional', 'Connect Quantum API for protection');
-                return;
-            }
-            const device = state.devices.find(d => d.id === id);
-            if (device) {
-                device.quantumProtected = true;
-                addLogEntry(`🧠 Quantum Shield applied to ${device.name}`, 'quantum');
-                addAIThought(`🛡️ Quantum protection added to ${device.name}`);
-                updateDeviceList();
-                drawTopology();
-                showToast('🧠 Quantum Shield', `${device.name} is now quantum protected`);
-            }
         }
 
         function updateStats() {
             const total = state.devices.length;
             const threats = state.devices.filter(d => d.status === 'danger' || d.status === 'warning').length;
-            const real = state.devices.filter(d => d.isReal).length;
-            const blocked = state.devices.filter(d => d.status === 'blocked').length;
-            const quantumProtected = state.devices.filter(d => d.quantumProtected).length;
+            const active = state.devices.filter(d => d.status !== 'blocked').length;
 
             totalDevices.textContent = total;
-            realDevices.textContent = real;
+            realDevices.textContent = active;
             totalThreats.textContent = state.totalDetected;
-            activeConnections.textContent = state.devices.filter(d => d.status !== 'blocked').length;
+            activeConnections.textContent = active;
 
-            const health = Math.max(0, 100 - (threats * 5) - (blocked * 2) + (quantumProtected * 2));
-            state.networkHealth = Math.min(100, health);
-            networkHealth.textContent = state.networkHealth + '%';
-            networkHealth.style.color = state.networkHealth > 80 ? 'var(--success)' : state.networkHealth > 50 ? 'var(--warning)' : 'var(--danger)';
+            const health = Math.max(0, 100 - (threats * 10));
+            state.networkHealth = health;
+            networkHealth.textContent = health + '%';
+            networkHealth.style.color = health > 80 ? 'var(--success)' : health > 50 ? 'var(--warning)' : 'var(--danger)';
 
             if (threats > 0) {
                 systemStatusDot.className = 'status-dot yellow';
                 systemStatusText.textContent = `⚠️ ${threats} Issues`;
-                systemStatusText.style.color = 'var(--warning)';
-                aiStatus.textContent = state.quantumConnected ? '🟣 Quantum' : '🟡 Monitoring';
-            } else if (quantumProtected > 0) {
-                systemStatusDot.className = 'status-dot green';
-                systemStatusText.textContent = `🛡️ ${quantumProtected} Protected`;
-                systemStatusText.style.color = 'var(--secondary)';
-                aiStatus.textContent = state.quantumConnected ? '🟣 Quantum' : '🟢 Secure';
             } else {
                 systemStatusDot.className = 'status-dot green';
-                systemStatusText.textContent = 'Ready';
-                systemStatusText.style.color = 'var(--text)';
-                aiStatus.textContent = state.quantumConnected ? '🟣 Quantum' : '🟢 Secure';
+                systemStatusText.textContent = 'Secure';
             }
-
-            if (state.quantumConnected) {
-                quantumStatusValue.textContent = '✅';
-                quantumStatusText.textContent = 'Quantum Ready';
-                quantumStatusValue.style.color = 'var(--secondary)';
-            } else {
-                quantumStatusValue.textContent = '⏳';
-                quantumStatusText.textContent = 'Optional';
-                quantumStatusValue.style.color = 'var(--warning)';
-            }
-
-            const baseConfidence = 99.8 - (threats * 0.05) + (quantumProtected * 0.01);
-            state.aiConfidence = Math.min(99.99, Math.max(90, baseConfidence));
-            aiConfidence.textContent = state.aiConfidence.toFixed(1) + '%';
         }
 
         function addLogEntry(msg, type = 'info') {
             state.log.unshift({ time: new Date().toLocaleTimeString(), msg, type });
-            if (state.log.length > 100) state.log.pop();
+            if (state.log.length > 50) state.log.pop();
             renderLog();
         }
 
         function renderLog() {
             if (state.log.length === 0) {
-                alertLog.innerHTML = `<div class="text-center text-muted" style="padding:10px 0;">No events logged</div>`;
+                alertLog.innerHTML = `<div class="text-center text-muted" style="padding:8px 0;">No events</div>`;
                 return;
             }
             let html = '';
-            state.log.slice(0, 30).forEach(entry => {
+            state.log.slice(0, 20).forEach(entry => {
                 html += `<div class="log-entry ${entry.type}">
                     <span class="time">${entry.time}</span>
                     <span class="msg">${entry.msg}</span>
                 </div>`;
             });
             alertLog.innerHTML = html;
-            logCountBadge.textContent = `${state.log.length} events`;
+            logCountBadge.textContent = state.log.length;
         }
 
         function addAIThought(text) {
             const timestamp = new Date().toLocaleTimeString();
             state.aiThoughts.push({ text, timestamp });
-            if (state.aiThoughts.length > 50) state.aiThoughts.shift();
+            if (state.aiThoughts.length > 30) state.aiThoughts.shift();
             let html = '';
             state.aiThoughts.slice(-15).forEach(thought => {
-                const textClass = thought.text.includes('Quantum') || thought.text.includes('🧠') ? 'quantum-text' : '';
-                html += `<div class="thought"><span class="thought-timestamp">[${thought.timestamp}]</span> <span class="${textClass}">${thought.text}</span></div>`;
+                html += `<div class="thought"><span class="thought-timestamp">[${thought.timestamp}]</span> ${thought.text}</div>`;
             });
             aiThoughts.innerHTML = html;
             aiThoughts.scrollTop = aiThoughts.scrollHeight;
@@ -1628,53 +1017,18 @@
 
         function clearAIThoughts() {
             state.aiThoughts = [];
-            aiThoughts.innerHTML = '<div class="thought"><span class="thought-timestamp">[CLEAR]</span> 🧠 AI memory cleared</div>';
+            aiThoughts.innerHTML = '<div class="thought"><span class="thought-timestamp">[CLEAR]</span> 🧠 Cleared</div>';
         }
 
         function clearLog() {
             state.log = [];
             renderLog();
-            showToast('🗑 Log Cleared', 'Log cleared');
+            showToast('🗑 Log Cleared', 'Done');
         }
 
         function exportLog() {
             const text = state.log.map(e => `[${e.time}] ${e.msg}`).join('\n');
-            downloadFile(text, `ECHOPLEX_${state.userName}_Log_${new Date().toISOString().slice(0,10)}.txt`);
-            showToast('📤 Log Exported', 'Log downloaded');
-        }
-
-        function exportMyReport() {
-            const report = {
-                user: state.userName,
-                session: state.sessionId,
-                timestamp: new Date().toISOString(),
-                ip: state.currentIP,
-                devices: state.devices,
-                totalDetected: state.totalDetected,
-                networkHealth: state.networkHealth,
-                aiConfidence: state.aiConfidence,
-                quantumConnected: state.quantumConnected,
-                scanCount: state.scanCount
-            };
-            downloadFile(JSON.stringify(report, null, 2), `ECHOPLEX_${state.userName}_Report_${new Date().toISOString().slice(0,10)}.json`);
-            showToast('📊 Report Exported', 'Complete report downloaded');
-        }
-
-        function clearMyData() {
-            if (confirm(`⚠️ Clear all data?`)) {
-                state.devices = [];
-                state.log = [];
-                state.aiThoughts = [];
-                state.totalDetected = 0;
-                state.deviceIdCounter = 0;
-                state.realDeviceCount = 0;
-                updateDeviceList();
-                updateStats();
-                drawTopology();
-                renderLog();
-                addAIThought(`🔄 Data cleared`);
-                showToast('🗑 Data Cleared', 'Your data has been cleared');
-            }
+            downloadFile(text, `ECHOPLEX_Log_${new Date().toISOString().slice(0,10)}.txt`);
         }
 
         function downloadFile(content, filename) {
@@ -1694,25 +1048,23 @@
                 toastTitle.classList.add('danger');
             } else if (title.includes('✅') || title.includes('Complete')) {
                 toastTitle.classList.add('success');
-            } else if (title.includes('🧠') || title.includes('Quantum')) {
-                toastTitle.classList.add('quantum');
             } else {
-                toastTitle.classList.add('info');
+                toastTitle.classList.add('warning');
             }
             toastBody.textContent = body;
             toastTime.textContent = new Date().toLocaleTimeString();
             toast.classList.add('show');
             if (state.toastTimer) clearTimeout(state.toastTimer);
-            state.toastTimer = setTimeout(() => toast.classList.remove('show'), 4000);
+            state.toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
         }
 
         // ============================================================
-        //  TOPOLOGY DRAWING - FIXED WITH PROPER VISUALIZATION
+        //  TOPOLOGY DRAWING
         // ============================================================
         function resizeTopology() {
             const rect = topologyCanvas.parentElement.getBoundingClientRect();
             topologyCanvas.width = rect.width - 4;
-            topologyCanvas.height = 400;
+            topologyCanvas.height = Math.max(280, Math.min(380, window.innerHeight * 0.35));
         }
 
         function drawTopology() {
@@ -1721,258 +1073,121 @@
             if (w === 0 || h === 0) { requestAnimationFrame(drawTopology); return; }
 
             ctx.clearRect(0, 0, w, h);
-            
-            // Background with gradient
-            const grad = ctx.createRadialGradient(w/2, h/2, 50, w/2, h/2, w/0.8);
-            grad.addColorStop(0, 'rgba(0, 212, 255, 0.03)');
-            grad.addColorStop(0.5, 'rgba(124, 58, 237, 0.02)');
-            grad.addColorStop(1, 'rgba(0, 0, 0, 0.3)');
-            ctx.fillStyle = grad;
-            ctx.fillRect(0, 0, w, h);
 
-            // Draw grid lines
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.02)';
-            ctx.lineWidth = 0.5;
-            for (let i = 0; i < w; i += 50) {
-                ctx.beginPath();
-                ctx.moveTo(i, 0);
-                ctx.lineTo(i, h);
-                ctx.stroke();
-            }
-            for (let i = 0; i < h; i += 50) {
-                ctx.beginPath();
-                ctx.moveTo(0, i);
-                ctx.lineTo(w, i);
-                ctx.stroke();
-            }
+            // Background
+            ctx.fillStyle = 'rgba(0,0,0,0.2)';
+            ctx.fillRect(0, 0, w, h);
 
             const cx = w / 2;
             const cy = h / 2;
-            const radius = Math.min(w, h) * 0.3;
+            const radius = Math.min(w, h) * 0.28;
 
-            // ===== DRAW HUB =====
-            // Hub glow
-            if (state.quantumConnected) {
-                const quantumGlow = ctx.createRadialGradient(cx, cy, 5, cx, cy, 70);
-                quantumGlow.addColorStop(0, 'rgba(124, 58, 237, 0.3)');
-                quantumGlow.addColorStop(0.5, 'rgba(124, 58, 237, 0.1)');
-                quantumGlow.addColorStop(1, 'rgba(0, 0, 0, 0)');
-                ctx.fillStyle = quantumGlow;
-                ctx.beginPath();
-                ctx.arc(cx, cy, 70, 0, Math.PI * 2);
-                ctx.fill();
-            }
-
-            // Hub outer ring
-            ctx.strokeStyle = state.quantumConnected ? 'rgba(124, 58, 237, 0.3)' : 'rgba(0, 212, 255, 0.2)';
-            ctx.lineWidth = 2;
-            ctx.setLineDash([5, 10]);
-            ctx.shadowColor = state.quantumConnected ? 'rgba(124, 58, 237, 0.2)' : 'rgba(0, 212, 255, 0.1)';
-            ctx.shadowBlur = 20;
+            // Hub
+            ctx.shadowColor = 'rgba(0, 212, 255, 0.2)';
+            ctx.shadowBlur = 30;
+            ctx.fillStyle = 'rgba(0, 212, 255, 0.1)';
             ctx.beginPath();
-            ctx.arc(cx, cy, radius + 15, 0, Math.PI * 2);
-            ctx.stroke();
-            ctx.setLineDash([]);
-            ctx.shadowBlur = 0;
-
-            // Hub center
-            ctx.fillStyle = 'rgba(0, 212, 255, 0.15)';
-            ctx.shadowColor = 'rgba(0, 212, 255, 0.3)';
-            ctx.shadowBlur = 40;
-            ctx.beginPath();
-            ctx.arc(cx, cy, 35, 0, Math.PI * 2);
+            ctx.arc(cx, cy, 25, 0, Math.PI * 2);
             ctx.fill();
             ctx.shadowBlur = 0;
 
-            // Hub inner ring
-            ctx.strokeStyle = state.quantumConnected ? 'rgba(124, 58, 237, 0.5)' : 'rgba(0, 212, 255, 0.4)';
-            ctx.lineWidth = 2;
-            ctx.shadowColor = state.quantumConnected ? 'rgba(124, 58, 237, 0.3)' : 'rgba(0, 212, 255, 0.2)';
-            ctx.shadowBlur = 15;
+            ctx.strokeStyle = 'rgba(0, 212, 255, 0.3)';
+            ctx.lineWidth = 1.5;
             ctx.beginPath();
-            ctx.arc(cx, cy, 25, 0, Math.PI * 2);
+            ctx.arc(cx, cy, 20, 0, Math.PI * 2);
             ctx.stroke();
-            ctx.shadowBlur = 0;
 
-            // Hub text
-            ctx.fillStyle = state.quantumConnected ? 'var(--secondary)' : '#00d4ff';
-            ctx.font = 'bold 11px Orbitron, monospace';
+            ctx.fillStyle = '#00d4ff';
+            ctx.font = 'bold 9px monospace';
             ctx.textAlign = 'center';
-            const ipLabel = state.currentIP || 'ECHOPLEX';
-            ctx.fillText(`🌐 ${ipLabel}`, cx, cy + 4);
-            
-            ctx.fillStyle = 'rgba(255,255,255,0.2)';
-            ctx.font = '8px monospace';
-            ctx.fillText(`${state.devices.length} devices`, cx, cy + 22);
-
-            if (state.quantumConnected) {
-                ctx.fillStyle = 'rgba(124, 58, 237, 0.4)';
-                ctx.font = '7px monospace';
-                ctx.fillText('🧠 QUANTUM SECURE', cx, cy + 38);
-            }
+            const label = state.currentIP || 'ECHOPLEX';
+            ctx.fillText(`🌐 ${label}`, cx, cy + 3);
 
             if (state.devices.length === 0) {
-                ctx.fillStyle = 'rgba(255,255,255,0.08)';
-                ctx.font = '13px Segoe UI, sans-serif';
-                ctx.fillText('🔍 Enter IP and click Scan', cx, cy + 65);
+                ctx.fillStyle = 'rgba(255,255,255,0.05)';
+                ctx.font = '11px sans-serif';
+                ctx.fillText('🔍 Enter IP to scan', cx, cy + 45);
                 requestAnimationFrame(drawTopology);
                 return;
             }
 
-            // ===== DRAW DEVICES =====
-            const devices = state.devices.slice(0, 25);
+            const devices = state.devices.slice(0, 20);
             const totalDevices = devices.length;
-            
+
             devices.forEach((device, i) => {
-                // Calculate position in a circle
                 const angle = (i / totalDevices) * Math.PI * 2 - Math.PI / 2 + (Date.now() / 8000);
-                const dist = radius * (0.5 + 0.4 * Math.sin(Date.now() / 10000 + i * 0.5));
+                const dist = radius * (0.4 + 0.5 * Math.sin(Date.now() / 10000 + i * 0.5));
                 const x = cx + Math.cos(angle) * dist;
                 const y = cy + Math.sin(angle) * dist;
 
-                // Connection line
-                const lineColor = device.status === 'danger' ? 'rgba(255,0,64,0.5)' :
-                                 device.status === 'warning' ? 'rgba(255,170,0,0.4)' :
-                                 device.status === 'blocked' ? 'rgba(107,122,143,0.3)' :
-                                 device.quantumProtected ? 'rgba(124,58,237,0.4)' :
-                                 'rgba(0,212,255,0.2)';
-                
-                ctx.strokeStyle = lineColor;
-                ctx.lineWidth = device.status === 'danger' ? 2.5 : 
-                               device.quantumProtected ? 2 : 
-                               device.isReal ? 1.5 : 1;
-                
-                ctx.shadowColor = device.quantumProtected ? 'rgba(124,58,237,0.3)' :
-                                 device.status === 'danger' ? 'rgba(255,0,64,0.3)' : 'rgba(0,212,255,0.1)';
-                ctx.shadowBlur = device.quantumProtected ? 15 : 10;
-                
+                const color = device.status === 'danger' ? 'rgba(255,0,64,0.4)' :
+                             device.status === 'warning' ? 'rgba(255,170,0,0.3)' :
+                             device.status === 'blocked' ? 'rgba(107,122,143,0.3)' :
+                             'rgba(0,255,136,0.15)';
+
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 1;
+                ctx.shadowColor = device.status === 'danger' ? 'rgba(255,0,64,0.2)' : 'rgba(0,212,255,0.1)';
+                ctx.shadowBlur = 8;
                 ctx.beginPath();
                 ctx.moveTo(cx, cy);
-                
-                // Curved line
-                const midAngle = (angle + (i / totalDevices) * Math.PI * 2) / 2;
-                const midDist = dist * 0.6;
-                const midX = cx + Math.cos(midAngle) * midDist;
-                const midY = cy + Math.sin(midAngle) * midDist;
-                
-                ctx.quadraticCurveTo(midX, midY, x, y);
+                ctx.lineTo(x, y);
                 ctx.stroke();
                 ctx.shadowBlur = 0;
 
-                // Device dot
                 const dotColor = device.status === 'danger' ? '#ff0040' :
                                 device.status === 'warning' ? '#ffaa00' :
-                                device.status === 'blocked' ? '#6b7a8f' :
-                                device.quantumProtected ? '#8b5cf6' :
-                                device.isReal ? '#00d4ff' : '#00ff88';
-                
-                const dotSize = device.status === 'danger' ? 12 : 
-                               device.quantumProtected ? 10 :
-                               device.isReal ? 9 : 8;
-                
-                // Glow
-                ctx.shadowColor = device.quantumProtected ? 'rgba(124,58,237,0.6)' :
-                                 device.status === 'danger' ? 'rgba(255,0,64,0.5)' :
-                                 device.isReal ? 'rgba(0,212,255,0.4)' : 'rgba(0,255,136,0.2)';
-                ctx.shadowBlur = device.quantumProtected ? 25 : 
-                                device.status === 'danger' ? 20 : 15;
-                
+                                device.status === 'blocked' ? '#6b7a8f' : '#00ff88';
+                const dotSize = device.status === 'danger' ? 8 : 
+                               device.isReal ? 7 : 6;
+
+                ctx.shadowColor = device.status === 'danger' ? 'rgba(255,0,64,0.4)' : 'rgba(0,255,136,0.2)';
+                ctx.shadowBlur = 12;
                 ctx.fillStyle = dotColor;
                 ctx.beginPath();
                 ctx.arc(x, y, dotSize, 0, Math.PI * 2);
                 ctx.fill();
                 ctx.shadowBlur = 0;
 
-                // Pulse animation for threats
                 if (device.status === 'danger' || device.status === 'warning') {
-                    const pulseRadius = dotSize + 8 + Math.sin(Date.now() / 500 + i) * 4;
-                    ctx.strokeStyle = device.status === 'danger' ? 'rgba(255,0,64,0.3)' : 'rgba(255,170,0,0.3)';
-                    ctx.lineWidth = 1.5;
-                    ctx.shadowColor = device.status === 'danger' ? 'rgba(255,0,64,0.2)' : 'rgba(255,170,0,0.2)';
-                    ctx.shadowBlur = 10;
+                    const pulseRadius = dotSize + 6 + Math.sin(Date.now() / 500 + i) * 3;
+                    ctx.strokeStyle = device.status === 'danger' ? 'rgba(255,0,64,0.2)' : 'rgba(255,170,0,0.2)';
+                    ctx.lineWidth = 1;
                     ctx.beginPath();
                     ctx.arc(x, y, pulseRadius, 0, Math.PI * 2);
                     ctx.stroke();
-                    ctx.shadowBlur = 0;
                 }
 
-                // Quantum ring
-                if (device.quantumProtected) {
-                    ctx.strokeStyle = 'rgba(124, 58, 237, 0.4)';
-                    ctx.lineWidth = 1.5;
-                    ctx.setLineDash([2, 4]);
-                    ctx.shadowColor = 'rgba(124, 58, 237, 0.2)';
-                    ctx.shadowBlur = 10;
-                    ctx.beginPath();
-                    ctx.arc(x, y, dotSize + 8, 0, Math.PI * 2);
-                    ctx.stroke();
-                    ctx.setLineDash([]);
-                    ctx.shadowBlur = 0;
-                }
-
-                // Real device ring
-                if (device.isReal) {
-                    ctx.strokeStyle = 'rgba(0,212,255,0.3)';
-                    ctx.lineWidth = 1;
-                    ctx.setLineDash([3, 5]);
-                    ctx.beginPath();
-                    ctx.arc(x, y, dotSize + 6, 0, Math.PI * 2);
-                    ctx.stroke();
-                    ctx.setLineDash([]);
-                }
-
-                // Device label
-                ctx.fillStyle = device.status === 'danger' ? '#ff6b8a' : 
-                               device.quantumProtected ? '#a78bfa' :
-                               device.isReal ? '#00d4ff' : '#9ca3af';
-                ctx.font = '8px Segoe UI, sans-serif';
+                ctx.fillStyle = device.status === 'danger' ? '#ff6b8a' : '#9ca3af';
+                ctx.font = '7px sans-serif';
                 ctx.textAlign = 'center';
-                const label = device.name.length > 14 ? device.name.slice(0,12)+'…' : device.name;
-                ctx.fillText(label, x, y + dotSize + 16);
-                
+                const name = device.name.length > 10 ? device.name.slice(0,8)+'…' : device.name;
+                ctx.fillText(name, x, y + dotSize + 10);
                 ctx.fillStyle = '#6b7a8f';
-                ctx.font = '7px monospace';
-                ctx.fillText(device.ip, x, y + dotSize + 28);
-                
-                // Threat badge
+                ctx.font = '6px monospace';
+                ctx.fillText(device.ip, x, y + dotSize + 18);
+
                 if (device.threat) {
-                    ctx.fillStyle = device.status === 'danger' ? '#ff0040' : '#ffaa00';
-                    ctx.font = '7px Segoe UI, sans-serif';
-                    ctx.fillText('⚠ ' + device.threat.slice(0,10), x, y - dotSize - 8);
-                }
-
-                // Icons
-                if (device.isMyDevice) {
-                    ctx.fillStyle = 'rgba(0, 212, 255, 0.8)';
-                    ctx.font = '7px monospace';
-                    ctx.fillText('👤', x + dotSize + 14, y + 4);
-                }
-
-                if (device.quantumProtected) {
-                    ctx.fillStyle = 'rgba(124, 58, 237, 0.6)';
-                    ctx.font = '7px monospace';
-                    ctx.fillText('🧠', x + dotSize + 14, y - 6);
+                    ctx.fillStyle = '#ff0040';
+                    ctx.font = '6px sans-serif';
+                    ctx.fillText('⚠', x + dotSize + 6, y - 4);
                 }
             });
 
-            // ===== SCANNING ANIMATION =====
+            // Scanning ring
             const scanAngle = (Date.now() / 4000) % (Math.PI * 2);
-            ctx.strokeStyle = state.quantumConnected ? 'rgba(124, 58, 237, 0.2)' : 'rgba(0, 212, 255, 0.15)';
-            ctx.lineWidth = 1.5;
-            ctx.setLineDash([5, 10]);
-            ctx.shadowColor = state.quantumConnected ? 'rgba(124, 58, 237, 0.1)' : 'rgba(0, 212, 255, 0.1)';
-            ctx.shadowBlur = 10;
+            ctx.strokeStyle = 'rgba(0, 212, 255, 0.1)';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([3, 6]);
             ctx.beginPath();
-            ctx.arc(cx, cy, radius + 20, scanAngle - 0.4, scanAngle + 0.4);
+            ctx.arc(cx, cy, radius + 10, scanAngle - 0.3, scanAngle + 0.3);
             ctx.stroke();
             ctx.setLineDash([]);
-            ctx.shadowBlur = 0;
 
-            // ===== DEVICE COUNT =====
-            ctx.fillStyle = 'rgba(255,255,255,0.04)';
-            ctx.font = '8px Segoe UI, sans-serif';
+            ctx.fillStyle = 'rgba(255,255,255,0.02)';
+            ctx.font = '7px monospace';
             ctx.textAlign = 'right';
-            ctx.fillText(`${state.devices.length} devices · ${state.currentIP}`, w - 10, h - 10);
+            ctx.fillText(`${state.devices.length} devices`, w - 6, h - 6);
 
             requestAnimationFrame(drawTopology);
         }
@@ -1983,71 +1198,60 @@
         function init() {
             resizeTopology();
             
-            // Set user
-            userIdDisplay.textContent = state.userName;
-            userNameInput.value = state.userName;
-            
             // Set default IP
             ipInput.value = CONFIG.defaultIP;
-            ipBadge.textContent = `📡 ${CONFIG.defaultIP}`;
             state.currentIP = CONFIG.defaultIP;
             
             // Set backend URL
             backendUrlInput.value = CONFIG.backendUrl;
 
-            // Load quantum API key
-            if (CONFIG.quantumApiKey) {
-                quantumApiKeyInput.value = CONFIG.quantumApiKey;
-                setTimeout(connectQuantumAPI, 1500);
-            }
-
-            // Initialize with a demo device
-            const demoDevice = {
+            // Add demo device
+            const demo = {
                 id: ++state.deviceIdCounter,
                 name: 'Demo Device',
-                type: '💻 Workstation',
+                type: '💻 Device',
                 ip: CONFIG.defaultIP,
                 mac: 'AA:BB:CC:DD:EE:FF',
-                os: 'Windows 11',
                 status: 'safe',
                 threat: null,
                 isReal: false,
-                isMyDevice: false,
-                quantumProtected: false,
-                lastSeen: new Date().toISOString(),
-                traffic: 45
+                lastSeen: new Date().toISOString()
             };
-            state.devices.push(demoDevice);
-            state.realDeviceCount++;
-            
+            state.devices.push(demo);
+
             updateDeviceList();
             updateStats();
             drawTopology();
 
-            addAIThought(`⚡ Welcome ${state.userName}!`);
-            addAIThought(`🔍 Enter any IP address to scan`);
-            addAIThought(`🌐 Examples: 192.168.1.1, 10.0.0.1`);
-            addLogEntry(`🟢 ECHOPLEX IP Scanner started`, 'success');
+            addAIThought('⚡ ECHOPLEX Ready - Works on ANY Device');
+            addAIThought('🔍 Enter any IP to scan');
+            addLogEntry('🟢 System started', 'success');
 
-            window.addEventListener('resize', resizeTopology);
+            window.addEventListener('resize', () => {
+                resizeTopology();
+            });
+
             setInterval(updateClock, 1000);
             updateClock();
             setInterval(updateStats, 3000);
-            
+
             // Check backend
-            setTimeout(checkBackendStatus, 2000);
+            setTimeout(checkBackend, 1500);
 
             setTimeout(() => {
-                showToast(`👤 Welcome ${state.userName}`, 'Enter an IP and click Scan');
-            }, 1500);
+                showToast('🌐 ECHOPLEX Active', 'Enter IP and click Scan');
+            }, 1000);
         }
 
         function updateClock() {
             const now = new Date();
             clockDisplay.textContent = now.toLocaleTimeString('en-US', { hour12: false });
-            footerTimestamp.textContent = `Last update: ${now.toLocaleString()}`;
+            footerTimestamp.textContent = `Last: ${now.toLocaleString()}`;
         }
 
+        // ============================================================
+        //  START
+        // ============================================================
         document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>

@@ -847,3 +847,227 @@ function updateStats() {
     state.totalThreats = threats;
     const rtts = list.map(d => d.rtt_ms).filter(v => v != null);
     const avg = rtts.length ? (rtts.reduce((a, b) => a + b, 0) / rtts.length).toFixed(0) : '—';
+   $('totalDevices').textContent = total;
+    $('onlineDevices').textContent = online;
+    $('phoneCount').textContent = phones;
+    $('totalThreats').textContent = state.totalThreats;
+    $('activeConnections').textContent = online;
+    $('avgRtt').textContent = avg === '—' ? '— ms avg' : `${avg} ms avg`;
+
+    const health = Math.max(0, 100 - threats * 12);
+    const healthEl = $('networkHealth');
+    healthEl.textContent = health + '%';
+    healthEl.className = 'stat-value ' + (health > 80 ? 'success' : health > 50 ? 'warning' : 'danger');
+
+    if (Date.now() < state.lockdownUntil) {
+        $('systemStatusDot').className = 'status-dot red';
+        $('systemStatusText').textContent = '🔒 LOCKDOWN';
+    } else if (threats > 0) {
+        $('systemStatusDot').className = 'status-dot yellow';
+        $('systemStatusText').textContent = `⚠️ ${threats} exposure(s)`;
+    } else if (state.scanning) {
+        $('systemStatusDot').className = 'status-dot scanning';
+        $('systemStatusText').textContent = 'Scanning…';
+    } else {
+        $('systemStatusDot').className = 'status-dot green';
+        $('systemStatusText').textContent = 'Secure';
+    }
+}
+
+/* ---------------- Log & AI thoughts ---------------- */
+function addLogEntry(msg, type = 'info') {
+    state.log.unshift({ time: now(), msg, type });
+    if (state.log.length > 100) state.log.pop();
+    renderLog();
+}
+
+function renderLog() {
+    if (!state.log.length) { $('alertLog').innerHTML = '<div class="text-center text-muted" style="padding:8px 0;">No events</div>'; return; }
+    $('alertLog').innerHTML = state.log.slice(0, 25).map(e =>
+        `<div class="log-entry ${esc(e.type)}"><span class="time">${esc(e.time)}</span><span class="msg">${esc(e.msg)}</span></div>`).join('');
+    $('logCountBadge').textContent = state.log.length;
+}
+
+function addAIThought(text) {
+    state.aiThoughts.push({ text, time: now() });
+    if (state.aiThoughts.length > 50) state.aiThoughts.shift();
+    const cls = text.includes('🧠') || text.includes('Quantum') ? 'quantum-text'
+              : text.startsWith('❌') ? 'err-text'
+              : text.includes('REAL') ? 'real-text' : '';
+    $('aiThoughts').insertAdjacentHTML('beforeend',
+        `<div class="thought"><span class="thought-timestamp">[${esc(now())}]</span> <span class="${cls}">${esc(text)}</span></div>`);
+    $('aiThoughts').scrollTop = $('aiThoughts').scrollHeight;
+    while ($('aiThoughts').children.length > 15) $('aiThoughts').firstElementChild.remove();
+}
+
+function clearAIThoughts() { state.aiThoughts = []; $('aiThoughts').innerHTML = ''; }
+function clearLog() { state.log = []; renderLog(); showToast('🗑 Log Cleared', 'Done'); }
+
+/* ---------------- Export ---------------- */
+function exportJSON() {
+    const data = [...state.devices.values()].map(d => ({
+        ip: d.ip, hostname: d.hostname, mac: d.mac, vendor: d.vendor,
+        device_type: d.device_type, os_guess: d.os_guess, ttl: d.ttl,
+        rtt_ms: d.rtt_ms, ports: d.ports, risk: d.risk
+    }));
+    download(JSON.stringify(data, null, 2), `echoplex_${Date.now()}.json`, 'application/json');
+}
+
+function exportCSV() {
+    const escCsv = s => `"${String(s ?? '').replace(/"/g, '""')}"`;
+    const head = ['ip', 'hostname', 'mac', 'vendor', 'device_type', 'os_guess', 'ttl', 'rtt_ms', 'ports', 'risk'];
+    const rows = [...state.devices.values()].map(d => [d.ip, d.hostname, d.mac, d.vendor, d.device_type,
+        d.os_guess, d.ttl, d.rtt_ms, (d.ports || []).join('|'), d.risk].map(escCsv).join(','));
+    download(head.join(',') + '\n' + rows.join('\n'), `echoplex_${Date.now()}.csv`, 'text/csv');
+}
+
+function download(content, filename, mime) {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([content], { type: mime }));
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(a.href);
+}
+
+/* ---------------- Toast & flash ---------------- */
+function showToast(title, body, kind) {
+    $('toastTitle').textContent = title;
+    $('toastTitle').className = 'title ' + (kind || (title.includes('❌') ? 'danger' : title.includes('✅') ? 'success' : title.includes('🧠') ? 'quantum' : 'warning'));
+    $('toastBody').textContent = body;
+    $('toastTime').textContent = now();
+    $('toast').classList.add('show');
+    clearTimeout(state.toastTimer);
+    state.toastTimer = setTimeout(() => $('toast').classList.remove('show'), 3000);
+}
+
+function flash(kind) {
+    $('flashOverlay').className = 'flash-overlay ' + kind;
+    setTimeout(() => $('flashOverlay').className = 'flash-overlay', 500);
+}
+
+/* ---------------- Topology ---------------- */
+function resizeTopology() {
+    const r = $('topologyCanvas').parentElement.getBoundingClientRect();
+    $('topologyCanvas').width = Math.max(300, r.width - 4);
+    $('topologyCanvas').height = Math.max(280, Math.min(380, window.innerHeight * 0.35));
+}
+
+function drawTopology() {
+    const c = $('topologyCanvas'), ctx = c.getContext('2d');
+    const w = c.width, h = c.height;
+    ctx.clearRect(0, 0, w, h);
+    ctx.fillStyle = 'rgba(0,0,0,.2)'; ctx.fillRect(0, 0, w, h);
+
+    const cx = w / 2, cy = h / 2, radius = Math.min(w, h) * 0.28;
+    const q = state.quantum.connected;
+
+    // Hub glow
+    if (q) {
+        const g = ctx.createRadialGradient(cx, cy, 5, cx, cy, 60);
+        g.addColorStop(0, 'rgba(124,58,237,.15)'); g.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx, cy, 60, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.fillStyle = q ? 'rgba(124,58,237,.12)' : 'rgba(0,212,255,.1)';
+    ctx.beginPath(); ctx.arc(cx, cy, 25, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = q ? 'rgba(124,58,237,.4)' : 'rgba(0,212,255,.3)';
+    ctx.lineWidth = q ? 2 : 1.5;
+    ctx.beginPath(); ctx.arc(cx, cy, 20, 0, Math.PI * 2); ctx.stroke();
+    ctx.fillStyle = q ? '#a78bfa' : '#00d4ff';
+    ctx.font = 'bold 9px monospace'; ctx.textAlign = 'center';
+    ctx.fillText(q ? '⚡ NETWORK 🔐' : '🌐 NETWORK', cx, cy + 3);
+    ctx.fillStyle = 'rgba(255,255,255,.35)'; ctx.font = '6px monospace';
+    ctx.fillText(q ? '🧠 QUANTUM' : (state.scanning ? '🔍 SCANNING' : '⏸ IDLE'), cx, cy + 15);
+
+    const list = [...state.devices.values()].slice(0, 20);
+    if (!list.length) {
+        ctx.fillStyle = 'rgba(255,255,255,.06)'; ctx.font = '11px sans-serif';
+        ctx.fillText('🔍 No devices — run a scan', cx, cy + 45);
+        state.raf = requestAnimationFrame(drawTopology);
+        return;
+    }
+
+    list.forEach((d, i) => {
+        const st = statusFor(d);
+        const angle = (i / list.length) * Math.PI * 2 - Math.PI / 2 + Date.now() / 8000;
+        const dist = radius * (0.45 + 0.5 * Math.abs(Math.sin(Date.now() / 10000 + i * 0.7)));
+        const x = cx + Math.cos(angle) * dist, y = cy + Math.sin(angle) * dist;
+        const color = st === 'danger' ? 'rgba(255,0,64,.4)' : st === 'warning' ? 'rgba(255,170,0,.3)'
+                    : st === 'blocked' ? 'rgba(107,122,143,.3)' : st === 'shielded' ? 'rgba(124,58,237,.3)'
+                    : 'rgba(0,255,136,.15)';
+        ctx.strokeStyle = color; ctx.lineWidth = st === 'shielded' ? 2 : 1;
+        ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(x, y); ctx.stroke();
+
+        const dotColor = st === 'danger' ? '#ff0040' : st === 'warning' ? '#ffaa00'
+                       : st === 'blocked' ? '#6b7a8f' : st === 'shielded' ? '#8b5cf6' : '#00ff88';
+        const size = st === 'danger' || st === 'shielded' ? 8 : 6;
+        ctx.fillStyle = dotColor;
+        ctx.beginPath(); ctx.arc(x, y, size, 0, Math.PI * 2); ctx.fill();
+
+        if (st === 'shielded') {
+            ctx.strokeStyle = 'rgba(124,58,237,.4)'; ctx.lineWidth = 1; ctx.setLineDash([2, 4]);
+            ctx.beginPath(); ctx.arc(x, y, size + 6, 0, Math.PI * 2); ctx.stroke(); ctx.setLineDash([]);
+        }
+        if (st === 'danger' || st === 'warning') {
+            ctx.strokeStyle = st === 'danger' ? 'rgba(255,0,64,.2)' : 'rgba(255,170,0,.2)';
+            ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.arc(x, y, size + 5 + Math.sin(Date.now() / 500 + i) * 3, 0, Math.PI * 2); ctx.stroke();
+        }
+
+        ctx.fillStyle = st === 'danger' ? '#ff6b8a' : st === 'shielded' ? '#a78bfa' : st === 'warning' ? '#ffaa00' : '#9ca3af';
+        ctx.font = '7px sans-serif';
+        const nm = (d.hostname || d.ip).slice(0, 10);
+        ctx.fillText(nm + ((d.hostname || '').length > 10 ? '…' : ''), x, y + size + 10);
+        ctx.fillStyle = '#6b7a8f'; ctx.font = '6px monospace'; ctx.fillText(d.ip, x, y + size + 18);
+    });
+
+    if (state.scanning) {
+        const a = (Date.now() / 3000) % (Math.PI * 2);
+        ctx.strokeStyle = q ? 'rgba(124,58,237,.25)' : 'rgba(0,212,255,.25)';
+        ctx.lineWidth = 1.5; ctx.setLineDash([3, 6]);
+        ctx.beginPath(); ctx.arc(cx, cy, radius + 10, a - 0.4, a + 0.4); ctx.stroke(); ctx.setLineDash([]);
+    }
+    state.raf = requestAnimationFrame(drawTopology);
+}
+
+/* ---------------- Init ---------------- */
+function init() {
+    // Restore preferences
+    const savedApi = localStorage.getItem('echoplex.apiBase');
+    if (savedApi) $('backendUrlInput').value = savedApi;
+    const savedSubnet = localStorage.getItem('echoplex.subnet');
+    if (savedSubnet) { $('subnetInput').value = savedSubnet; $('subnetInfo').textContent = `Subnet: ${savedSubnet}`; }
+
+    resizeTopology();
+    $('intervalSelect').addEventListener('change', scheduleScan);
+    $('demoSelect').addEventListener('change', e => toggleDemo(e.target.value === '1'));
+    window.addEventListener('resize', resizeTopology);
+    setInterval(() => { $('clockDisplay').textContent = new Date().toLocaleTimeString('en-US', { hour12: false }); $('footerTimestamp').textContent = `Last: ${new Date().toLocaleString()}`; }, 1000);
+
+    updateDeviceList(); updateStats(); drawTopology();
+    addAIThought('⚡ ECHOPLEX v6 ready');
+    addAIThought('🔍 Real scanner — no fabricated findings');
+    addAIThought('🧠 Quantum: simulated until token provided');
+
+    (async () => {
+        const ok = await checkBackend();
+        if (ok) {
+            refreshQuantumStatus();
+            await discoverNetwork();
+            scheduleScan();
+            setTimeout(runScan, 800);
+        } else {
+            // Backend down: offer explicit demo mode only
+            toggleDemo(true);
+            showToast('⚠️ Backend Offline', 'Demo mode enabled — devices are simulated');
+            addLogEntry('⚠️ Backend offline — demo mode enabled (simulated)', 'warning');
+        }
+    })();
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
+
+
+   
